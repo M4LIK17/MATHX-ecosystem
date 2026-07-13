@@ -1,0 +1,2466 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GEO-X — Geografia Interativa</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════
+       GEO-X — ESTILOS COMPLETOS (sem globo 3D)
+    ═══════════════════════════════════════════ */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0a120a;
+      color: #e8f0e8;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    :root {
+      --geo-bg: #0a120a;
+      --geo-card: #111e11;
+      --geo-border: #1e3a1e;
+      --geo-green: #4CAF50;
+      --geo-forest: #2E7D32;
+      --geo-earth: #8B7D6B;
+      --geo-sky: #64B5F6;
+      --geo-water: #1E88E5;
+      --geo-sand: #D4A373;
+      --geo-cream: #e8f0e8;
+      --geo-muted: #5a7a5a;
+      --geo-dark: #0a120a;
+      --geo-shadow: rgba(76, 175, 80, 0.2);
+    }
+
+    body.light-mode {
+      --geo-bg: #f0f5f0;
+      --geo-card: #ffffff;
+      --geo-border: #c8dcc8;
+      --geo-cream: #1a2a1a;
+      --geo-muted: #6a8a6a;
+      --geo-shadow: rgba(0, 0, 0, 0.08);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      background: var(--geo-bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--geo-border);
+      border-radius: 999px;
+    }
+
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem 4rem;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .geo-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0 1.5rem;
+      border-bottom: 2px solid var(--geo-border);
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .geo-header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .geo-header-left i {
+      font-size: 2.2rem;
+      color: var(--geo-sand);
+    }
+
+    .geo-header-left h1 {
+      font-size: 1.8rem;
+      color: var(--geo-green);
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .geo-header-left h1 span {
+      color: var(--geo-sand);
+    }
+
+    .geo-header .badge {
+      background: var(--geo-border);
+      color: var(--geo-sky);
+      padding: 0.2rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .header-actions button {
+      background: none;
+      border: none;
+      color: var(--geo-cream);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .header-actions button:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--geo-border);
+    }
+
+    /* SEARCH */
+    .search-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      max-width: 500px;
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--geo-border);
+      background: var(--geo-card);
+      color: var(--geo-cream);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .search-bar input:focus {
+      border-color: var(--geo-green);
+    }
+
+    .search-bar input::placeholder {
+      color: var(--geo-muted);
+    }
+
+    .search-bar button {
+      padding: 0.6rem 1.2rem;
+      background: var(--geo-green);
+      border: none;
+      border-radius: 8px;
+      color: #0a120a;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .search-bar button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px var(--geo-shadow);
+    }
+
+    .search-results {
+      display: none;
+      background: var(--geo-card);
+      border: 1px solid var(--geo-border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .search-results.active {
+      display: block;
+    }
+
+    .search-results .result-item {
+      padding: 0.5rem;
+      border-bottom: 1px solid var(--geo-border);
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .search-results .result-item:hover {
+      background: rgba(76, 175, 80, 0.08);
+    }
+
+    .search-results .result-item .titulo {
+      color: var(--geo-green);
+      font-weight: 600;
+    }
+
+    .search-results .result-item .desc {
+      color: var(--geo-muted);
+      font-size: 0.8rem;
+    }
+
+    .search-results .no-results {
+      color: var(--geo-muted);
+      text-align: center;
+      padding: 1rem;
+    }
+
+    /* MENU CIRCULAR */
+    .btn-menu-toggle {
+      background: none;
+      border: none;
+      color: var(--geo-green);
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0.3rem 0.6rem;
+      border-radius: 8px;
+      border: 1px solid transparent;
+    }
+
+    .btn-menu-toggle:hover {
+      border-color: var(--geo-border);
+      background: rgba(76, 175, 80, 0.06);
+      transform: scale(1.05);
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .geo-menu-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      z-index: 1000;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .geo-menu-container.active {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .geo-menu {
+      position: relative;
+      width: 320px;
+      height: 320px;
+    }
+
+    .knob {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle at 30% 30%, #1a3a1a, #0d1f0d);
+      border-radius: 50%;
+      border: 2px solid var(--geo-green);
+      box-shadow: 0 0 40px rgba(76, 175, 80, 0.15);
+      cursor: pointer;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      color: var(--geo-green);
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      user-select: none;
+    }
+
+    .knob:hover {
+      transform: translate(-50%, -50%) scale(1.06);
+      box-shadow: 0 0 60px rgba(76, 175, 80, 0.25);
+    }
+
+    .knob i {
+      transition: transform 0.6s ease;
+    }
+
+    .geo-menu.active .knob i {
+      transform: rotate(360deg);
+    }
+
+    .knob .label {
+      position: absolute;
+      bottom: -30px;
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--geo-green);
+      opacity: 0.5;
+      white-space: nowrap;
+    }
+
+    .geo-menu ul {
+      list-style: none;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .geo-menu li {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 60px;
+      height: 60px;
+      margin: -30px;
+      transform: rotate(calc(var(--i) * 60deg)) translate(125px) rotate(calc(var(--i) * -60deg));
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .geo-menu.active li {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .geo-menu li:nth-child(1) { --i: 0; }
+    .geo-menu li:nth-child(2) { --i: 1; }
+    .geo-menu li:nth-child(3) { --i: 2; }
+    .geo-menu li:nth-child(4) { --i: 3; }
+    .geo-menu li:nth-child(5) { --i: 4; }
+    .geo-menu li:nth-child(6) { --i: 5; }
+    .geo-menu li:nth-child(7) { --i: 6; }
+
+    .geo-menu li button {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 1.5px solid var(--geo-border);
+      background: radial-gradient(circle at 30% 30%, #162016, #0d1f0d);
+      color: var(--geo-cream);
+      cursor: pointer;
+      font-size: 22px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .geo-menu li button:hover {
+      transform: scale(1.15);
+      border-color: var(--geo-green);
+      box-shadow: 0 0 30px rgba(76, 175, 80, 0.2);
+      background: radial-gradient(circle at 30% 30%, #1e3a1e, #0d1f0d);
+    }
+
+    .geo-menu li button::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: -28px;
+      font-size: 0.55rem;
+      letter-spacing: 0.5px;
+      color: var(--geo-muted);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      font-weight: 600;
+    }
+
+    .geo-menu li button:hover::after {
+      opacity: 1;
+    }
+
+    .geo-menu li:last-child button {
+      border-color: var(--geo-sand);
+      color: var(--geo-sand);
+    }
+
+    .geo-menu li:last-child button:hover {
+      border-color: var(--geo-sand);
+      box-shadow: 0 0 30px rgba(212, 163, 115, 0.2);
+    }
+
+    .menu-close-btn {
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      background: rgba(255, 68, 68, 0.12);
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      color: #ff6b6b;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+    }
+
+    .menu-close-btn:hover {
+      background: rgba(255, 68, 68, 0.25);
+      transform: scale(1.1);
+    }
+
+    /* MODULES */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .modules-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .modules-grid {
+        grid-template-columns: 1fr;
+      }
+      .app-container {
+        padding: 1rem;
+      }
+      .geo-menu {
+        width: 260px;
+        height: 260px;
+      }
+      .geo-menu li {
+        width: 48px;
+        height: 48px;
+        margin: -24px;
+        transform: rotate(calc(var(--i) * 60deg)) translate(100px) rotate(calc(var(--i) * -60deg));
+      }
+      .geo-menu li button {
+        font-size: 18px;
+      }
+      .knob {
+        width: 64px;
+        height: 64px;
+        font-size: 22px;
+      }
+      .menu-close-btn {
+        top: -12px;
+        right: -12px;
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+      }
+      .search-bar {
+        max-width: 100%;
+      }
+    }
+
+    .module-card {
+      background: var(--geo-card);
+      border: 1px solid var(--geo-border);
+      border-radius: 14px;
+      padding: 1.6rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .module-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--geo-green);
+      box-shadow: 0 8px 40px var(--geo-shadow);
+    }
+
+    .module-card .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .module-card .card-header i {
+      font-size: 1.6rem;
+      color: var(--geo-sand);
+    }
+
+    .module-card .card-header h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--geo-cream);
+      flex: 1;
+    }
+
+    .module-card .card-desc {
+      font-size: 0.82rem;
+      color: var(--geo-muted);
+      line-height: 1.5;
+    }
+
+    .badge-new-tag {
+      background: rgba(76, 175, 80, 0.2);
+      border: 1px solid var(--geo-green);
+      color: var(--geo-green);
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    /* MODULE PAGE */
+    .modulo-pagina {
+      display: none;
+      animation: fadeIn 0.4s ease both;
+    }
+
+    .modulo-pagina.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .btn-voltar {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--geo-border);
+      color: var(--geo-muted);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-voltar:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--geo-cream);
+      transform: translateX(-3px);
+    }
+
+    .modulo-container {
+      background: var(--geo-card);
+      border: 1px solid var(--geo-border);
+      border-radius: 14px;
+      padding: 1.6rem;
+    }
+
+    .modulo-container .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .modulo-container .card-header i {
+      font-size: 1.8rem;
+      color: var(--geo-sand);
+    }
+
+    .modulo-container .card-header h2 {
+      font-size: 1.2rem;
+      color: var(--geo-green);
+    }
+
+    /* TABS */
+    .inner-tabs {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 0.35rem 0.8rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--geo-border);
+      border-radius: 999px;
+      color: var(--geo-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active,
+    .tab-btn:hover {
+      background: var(--geo-green);
+      border-color: var(--geo-green);
+      color: #0a120a;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.25s ease both;
+    }
+
+    /* SÍNTESE */
+    .geo-sintese {
+      background: rgba(76, 175, 80, 0.06);
+      border-left: 4px solid var(--geo-green);
+      padding: 1.2rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 1.2rem;
+    }
+
+    .geo-sintese h4 {
+      color: var(--geo-green);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .geo-sintese p,
+    .geo-sintese li {
+      color: var(--geo-cream);
+      font-size: 0.85rem;
+      line-height: 1.7;
+    }
+
+    .geo-sintese ul {
+      padding-left: 1.5rem;
+    }
+
+    /* EXERCÍCIOS */
+    .geo-exercicio {
+      background: rgba(76, 175, 80, 0.04);
+      border: 1px solid var(--geo-border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .geo-exercicio .pergunta {
+      color: var(--geo-sky);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .geo-exercicio .opcoes {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .geo-exercicio .opcoes label {
+      color: var(--geo-cream);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .geo-exercicio .opcoes input[type="radio"] {
+      accent-color: var(--geo-green);
+      margin-right: 0.5rem;
+    }
+
+    .btn-verificar {
+      margin-top: 0.7rem;
+      padding: 0.4rem 1rem;
+      background: var(--geo-green);
+      border: none;
+      border-radius: 8px;
+      color: #0a120a;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-verificar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px var(--geo-shadow);
+    }
+
+    .resposta-feedback {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .resposta-feedback.correto {
+      color: var(--geo-green);
+    }
+    .resposta-feedback.errado {
+      color: #ff6b6b;
+    }
+
+    /* SOLUÇÕES */
+    .geo-solucao {
+      background: rgba(76, 175, 80, 0.05);
+      border: 1px dashed var(--geo-border);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .geo-solucao .solucao-titulo {
+      color: var(--geo-sand);
+      font-weight: 700;
+      font-size: 0.8rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .geo-solucao .solucao-texto {
+      color: var(--geo-cream);
+      font-size: 0.82rem;
+    }
+
+    /* QUIZ */
+    .btn-quiz-iniciar {
+      padding: 0.6rem 1.5rem;
+      background: var(--geo-green);
+      border: none;
+      border-radius: 8px;
+      color: #0a120a;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-quiz-iniciar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px var(--geo-shadow);
+    }
+
+    .btn-quiz-cancelar {
+      padding: 0.6rem 1.5rem;
+      background: rgba(255, 68, 68, 0.12);
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      border-radius: 8px;
+      color: #ff6b6b;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: none;
+    }
+
+    .btn-quiz-cancelar:hover {
+      background: rgba(255, 68, 68, 0.22);
+    }
+
+    /* FLASHCARDS */
+    .geo-flashcard {
+      perspective: 800px;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      cursor: pointer;
+    }
+
+    .geo-flashcard .card-inner {
+      position: relative;
+      width: 100%;
+      min-height: 160px;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+
+    .geo-flashcard .card-inner.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .geo-flashcard .card-front,
+    .geo-flashcard .card-back {
+      position: absolute;
+      width: 100%;
+      min-height: 160px;
+      backface-visibility: hidden;
+      border-radius: 8px;
+      padding: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .geo-flashcard .card-front {
+      background: var(--geo-card);
+      border: 1px solid var(--geo-border);
+      color: var(--geo-cream);
+    }
+
+    .geo-flashcard .card-back {
+      background: var(--geo-green);
+      color: #0a120a;
+      transform: rotateY(180deg);
+      font-weight: 600;
+    }
+
+    .flashcard-counter {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--geo-muted);
+      margin-top: 0.8rem;
+    }
+
+    .flashcard-nav {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    .flashcard-nav button {
+      padding: 0.3rem 0.8rem;
+      background: rgba(76, 175, 80, 0.15);
+      border: 1px solid var(--geo-border);
+      border-radius: 8px;
+      color: var(--geo-cream);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .flashcard-nav button:hover {
+      background: rgba(76, 175, 80, 0.3);
+      border-color: var(--geo-green);
+    }
+
+    /* TIMELINE */
+    .geo-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      padding: 0.5rem 0;
+    }
+
+    .geo-timeline .evento {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 0.8rem;
+      background: rgba(76, 175, 80, 0.04);
+      border-radius: 8px;
+      border-left: 3px solid var(--geo-green);
+    }
+
+    .geo-timeline .evento .ano {
+      font-weight: 800;
+      color: var(--geo-sand);
+      min-width: 80px;
+      font-size: 0.9rem;
+    }
+
+    .geo-timeline .evento .desc {
+      color: var(--geo-cream);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* MAPA (alternativa sem Leaflet) */
+    .geo-mapa-container {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--geo-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .geo-mapa-container i {
+      font-size: 3rem;
+      color: var(--geo-sand);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .legenda {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin: 0.8rem 0;
+    }
+
+    .legenda span {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--geo-cream);
+    }
+
+    .dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot-green {
+      background: #4CAF50;
+    }
+    .dot-red {
+      background: #ff6b6b;
+    }
+    .dot-blue {
+      background: #1E88E5;
+    }
+    .dot-orange {
+      background: #D4A373;
+    }
+
+    .info-box {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      text-align: left;
+      margin: 0.8rem 0;
+    }
+
+    .info-box p {
+      color: var(--geo-cream);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      margin: 0.3rem 0;
+    }
+
+    .info-box strong {
+      color: var(--geo-sand);
+    }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding: 2rem 1rem 0.5rem;
+      border-top: 1px solid var(--geo-border);
+      color: var(--geo-muted);
+      font-size: 0.8rem;
+      margin-top: 2rem;
+    }
+
+    .powered {
+      color: var(--geo-sand);
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    /* BOOT SCREEN */
+    #boot-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0a120a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999 !important;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    #boot-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #particles-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .boot-container {
+      text-align: center;
+      padding: 2rem;
+      z-index: 2;
+      position: relative;
+    }
+
+    .boot-logo {
+      font-size: 4rem;
+      font-weight: 900;
+      letter-spacing: 6px;
+      margin-bottom: 2.5rem;
+      animation: bootPulse 1.2s ease-in-out infinite;
+    }
+
+    .boot-logo .logo-geo {
+      color: #4CAF50;
+    }
+
+    .boot-logo .logo-x {
+      color: #D4A373;
+    }
+
+    @keyframes bootPulse {
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.7;
+        transform: scale(0.98);
+      }
+    }
+
+    .boot-loader {
+      width: 240px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      margin: 0 auto 1.5rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .boot-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #D4A373);
+      border-radius: 4px;
+      animation: bootProgress 2.5s ease-in-out forwards;
+    }
+
+    @keyframes bootProgress {
+      0% {
+        width: 0%;
+      }
+      20% {
+        width: 25%;
+      }
+      40% {
+        width: 45%;
+      }
+      60% {
+        width: 65%;
+      }
+      80% {
+        width: 85%;
+      }
+      100% {
+        width: 100%;
+      }
+    }
+
+    .boot-status {
+      font-size: 0.85rem;
+      color: #64B5F6;
+      font-weight: 300;
+      letter-spacing: 2px;
+      margin-bottom: 2.5rem;
+      min-height: 1.5rem;
+      font-family: 'Courier New', monospace;
+    }
+
+    .boot-powered {
+      position: fixed !important;
+      bottom: 30px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 0.55rem;
+      color: rgba(255, 255, 255, 0.08);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-weight: 300;
+      z-index: 2;
+      transition: color 0.5s ease;
+    }
+
+    .boot-powered:hover {
+      color: rgba(255, 255, 255, 0.15);
+    }
+
+    @media (max-width: 600px) {
+      .boot-logo {
+        font-size: 3rem;
+      }
+      .boot-loader {
+        width: 180px;
+      }
+    }
+    /* ─── MASCOTE GEOBOT ─── */
+.mascote-container {
+  position: fixed; bottom: 30px; left: 30px; z-index: 9999;
+  pointer-events: none; width: 90px; height: 90px;
+}
+.mascote-body {
+  width: 90px; height: 90px;
+  background: linear-gradient(145deg, #1a3a1a, #0a1f0a);
+  border-radius: 50%; border: 3px solid #4CAF50;
+  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; animation: floatMascote 3s ease-in-out infinite;
+}
+.mascote-body::before, .mascote-body::after {
+  content: ''; position: absolute; top: -20px;
+  width: 3px; height: 20px; background: #4CAF50; border-radius: 2px;
+}
+.mascote-body::before { left: 25px; } .mascote-body::after { right: 25px; }
+.mascote-antena {
+  position: absolute; top: -25px; width: 10px; height: 10px;
+  background: #D4A373; border-radius: 50%;
+  box-shadow: 0 0 15px #D4A373;
+  animation: piscaAntena 1.5s ease-in-out infinite;
+}
+.mascote-antena-left { left: 21px; } .mascote-antena-right { right: 21px; }
+.mascote-eyes { display: flex; gap: 20px; margin-top: 5px; }
+.mascote-eye {
+  width: 18px; height: 18px;
+  background: #0a120a; border-radius: 50%;
+  border: 2px solid #4CAF50; position: relative; overflow: hidden;
+}
+.mascote-pupil {
+  width: 8px; height: 8px; background: #4CAF50; border-radius: 50%;
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.05s linear;
+  box-shadow: inset 0 0 5px rgba(76, 175, 80, 0.5);
+}
+.mascote-mouth {
+  width: 20px; height: 8px;
+  border-bottom: 3px solid #4CAF50;
+  border-radius: 0 0 20px 20px; margin-top: 4px;
+  transition: all 0.3s ease;
+}
+.mascote-container.happy .mascote-mouth {
+  width: 25px; height: 12px;
+  border-bottom: 4px solid #D4A373;
+  border-radius: 0 0 30px 30px;
+}
+.mascote-container.happy .mascote-eye { border-color: #D4A373; }
+.mascote-container.happy .mascote-pupil { background: #D4A373; }
+.mascote-label {
+  position: absolute; bottom: -30px;
+  background: rgba(0,0,0,0.7); color: #4CAF50;
+  padding: 2px 10px; border-radius: 10px;
+  font-size: 11px; font-weight: 700; border: 1px solid #1e3a1e;
+  white-space: nowrap;
+}
+.mascote-glow {
+  position: absolute; top: -5px;
+  width: 15px; height: 15px;
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.3), transparent);
+  border-radius: 50%;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+@keyframes floatMascote { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+@keyframes piscaAntena { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.7); } }
+@keyframes glowPulse { 0%,100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+@media (max-width: 600px) {
+  .mascote-container { width: 70px; height: 70px; bottom: 15px; left: 15px; }
+  .mascote-body { width: 70px; height: 70px; }
+  .mascote-eye { width: 14px; height: 14px; }
+  .mascote-pupil { width: 6px; height: 6px; }
+  .mascote-eyes { gap: 15px; }
+  .mascote-label { font-size: 9px; bottom: -25px; }
+}
+  </style>
+</head>
+<body>
+
+  <!-- BOOT SCREEN GEO-X -->
+  <div id="boot-screen">
+    <canvas id="particles-canvas"></canvas>
+    <div class="boot-container">
+      <div class="boot-logo">
+        <span class="logo-geo">GEO</span><span class="logo-x">-X</span>
+      </div>
+      <div class="boot-loader"><div class="boot-bar"></div></div>
+      <div class="boot-status" id="boot-status">Inicializando...</div>
+      <div class="boot-powered">POWERED BY M4L!K</div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      console.log('🌍 Boot GEO-X iniciado');
+      var bootScreen = document.getElementById('boot-screen');
+      var statusEl = document.getElementById('boot-status');
+      if (!bootScreen || !statusEl) {
+        console.error('❌ Elementos do boot não encontrados');
+        return;
+      }
+
+      var canvas = document.getElementById('particles-canvas');
+      var ctx = canvas.getContext('2d');
+      var width, height;
+
+      var symbols = ['🌍', '🗺️', '🏔️', '🌊', '🌴', '🏜️', '❄️', '🌋', '🏝️', '🌿', '🌎', '🌏', '🌐', '📍', '🧭', '⛰️', '🌲', '🌵',
+        '🐘', '🦒', '🦁', '🐆', '🦓', '🦛', '🐊', '🦅', '🐠', '🐬', '🐳', '🌾', '🌽', '🍌', '🌺'
+      ];
+
+      function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      var particles = [];
+      var NUM_PARTICLES = 160;
+
+      function randomColor() {
+        var colors = ['#4CAF50', '#D4A373', '#64B5F6', '#1E88E5', '#8B7D6B', '#2E7D32', '#D4A373'];
+        return colors[Math.floor(Math.random() * colors.length)];
+      }
+
+      function createParticle() {
+        return {
+          x: Math.random() * width,
+          y: Math.random() * height,
+          size: 18 + Math.random() * 20,
+          speedX: (Math.random() - 0.5) * 0.3,
+          speedY: (Math.random() - 0.5) * 0.3,
+          symbol: symbols[Math.floor(Math.random() * symbols.length)],
+          color: randomColor(),
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.02,
+          opacity: 0.04 + Math.random() * 0.04,
+          life: 0,
+          maxLife: 250 + Math.random() * 350
+        };
+      }
+      for (var i = 0; i < NUM_PARTICLES; i++) particles.push(createParticle());
+
+      function animateParticles() {
+        ctx.clearRect(0, 0, width, height);
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i];
+          p.x += p.speedX;
+          p.y += p.speedY;
+          p.rotation += p.rotationSpeed;
+          p.life++;
+          if (p.x < -50 || p.x > width + 50 || p.y < -50 || p.y > height + 50 || p.life > p.maxLife) {
+            particles[i] = createParticle();
+            particles[i].life = 0;
+          }
+          p.speedX += (Math.random() - 0.5) * 0.01;
+          p.speedY += (Math.random() - 0.5) * 0.01;
+          p.speedX = Math.max(-0.8, Math.min(0.8, p.speedX));
+          p.speedY = Math.max(-0.8, Math.min(0.8, p.speedY));
+          var alpha = p.opacity * (1 - p.life / p.maxLife);
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0.01, alpha);
+          ctx.font = p.size + 'px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(p.symbol, 0, 0);
+          ctx.restore();
+        }
+        requestAnimationFrame(animateParticles);
+      }
+      animateParticles();
+
+      var bootMessages = ['Inicializando...', 'Carregando módulos...', 'Configurando interface...',
+        'Conectando ao servidor...', 'GEO-X pronto!', 'Powered by M4L!K 🚀'
+      ];
+      var index = 0;
+      var messageInterval = setInterval(function() {
+        index++;
+        if (index < bootMessages.length) {
+          statusEl.textContent = bootMessages[index];
+        } else {
+          clearInterval(messageInterval);
+        }
+      }, 400);
+
+      setTimeout(function() {
+        bootScreen.classList.add('hidden');
+        setTimeout(function() {
+          bootScreen.style.display = 'none';
+        }, 800);
+      }, 4500);
+      setTimeout(function() {
+        if (!bootScreen.classList.contains('hidden')) {
+          bootScreen.classList.add('hidden');
+          setTimeout(function() {
+            bootScreen.style.display = 'none';
+          }, 800);
+        }
+      }, 7000);
+      console.log('✅ Boot GEO-X carregado com sucesso');
+    })();
+  </script>
+
+  <!-- MENU OVERLAY -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+
+  <!-- MENU CIRCULAR -->
+  <div class="geo-menu-container" id="menuContainer">
+    <div class="geo-menu" id="geoMenu">
+      <button class="menu-close-btn" id="menuCloseBtn" aria-label="Fechar menu">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <div class="knob" id="menuKnob">
+        <i class="fas fa-globe-africa"></i>
+        <span class="label">GEO-X</span>
+      </div>
+
+      <ul>
+        <li><button data-tooltip="População" onclick="abrirModulo('unidade1')"><i class="fas fa-users"></i></button></li>
+        <li><button data-tooltip="Agricultura" onclick="abrirModulo('unidade2')"><i class="fas fa-seedling"></i></button></li>
+        <li><button data-tooltip="Indústria" onclick="abrirModulo('unidade3')"><i class="fas fa-industry"></i></button></li>
+        <li><button data-tooltip="Turismo" onclick="abrirModulo('unidade4')"><i class="fas fa-umbrella-beach"></i></button></li>
+        <li><button data-tooltip="Transportes" onclick="abrirModulo('unidade5')"><i class="fas fa-train"></i></button></li>
+        <li><button data-tooltip="Urbanismo" onclick="abrirModulo('unidade6')"><i class="fas fa-city"></i></button></li>
+        <li><button data-tooltip="← MATHX" onclick="voltarMathX()" style="border-color:var(--geo-sand);color:var(--geo-sand);"><i class="fas fa-arrow-left"></i></button></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <div class="app-container">
+
+    <!-- HEADER -->
+    <header class="geo-header">
+      <div class="geo-header-left">
+        <i class="fas fa-globe-africa"></i>
+        <h1>GEO<span>-X</span></h1>
+        <span class="badge">6 Módulos</span>
+      </div>
+      <div class="header-actions">
+        <button onclick="toggleTheme()" title="Alternar tema" id="themeToggle">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button class="btn-menu-toggle" id="menuToggleBtn" aria-label="Abrir menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- SEARCH -->
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="🔍 Pesquisar por palavra-chave..." onkeyup="buscarConteudo(event)">
+      <button onclick="buscarConteudo()"><i class="fas fa-search"></i></button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+
+    <!-- LISTA DE MÓDULOS -->
+    <div id="modulo-lista">
+      <div class="modules-grid">
+        <div class="module-card" onclick="abrirModulo('unidade1')">
+          <div class="card-header"><i class="fas fa-users"></i><h3>Unidade 1: População</h3></div>
+          <p class="card-desc">Distribuição, crescimento, migrações, teorias demográficas, estrutura etária, problemas demográficos.</p>
+        </div>
+
+        <div class="module-card" onclick="abrirModulo('unidade2')">
+          <div class="card-header"><i class="fas fa-seedling"></i><h3>Unidade 2: Agricultura e Pecuária</h3><span class="badge-new-tag">NOVO</span></div>
+          <p class="card-desc">Evolução, espaço agrário, factores naturais e humanos, sistemas agrários, agricultura moderna.</p>
+        </div>
+
+        <div class="module-card" onclick="abrirModulo('unidade3')">
+          <div class="card-header"><i class="fas fa-industry"></i><h3>Unidade 3: Indústria e Comércio</h3><span class="badge-new-tag">NOVO</span></div>
+          <p class="card-desc">Revolução Industrial, localização industrial, tipos de indústria, comércio e desigualdades.</p>
+        </div>
+
+        <div class="module-card" onclick="abrirModulo('unidade4')">
+          <div class="card-header"><i class="fas fa-umbrella-beach"></i><h3>Unidade 4: Turismo</h3><span class="badge-new-tag">NOVO</span></div>
+          <p class="card-desc">Conceito, tipos, importância, património turístico.</p>
+        </div>
+
+        <div class="module-card" onclick="abrirModulo('unidade5')">
+          <div class="card-header"><i class="fas fa-train"></i><h3>Unidade 5: Transportes e Comunicações</h3><span class="badge-new-tag">NOVO</span></div>
+          <p class="card-desc">Evolução, tipos de transporte, meios de comunicação, impacto ambiental.</p>
+        </div>
+
+        <div class="module-card" onclick="abrirModulo('unidade6')">
+          <div class="card-header"><i class="fas fa-city"></i><h3>Unidade 6: Urbanismo</h3><span class="badge-new-tag">NOVO</span></div>
+          <p class="card-desc">Conceito de cidade, evolução, funções, relações cidade-campo, problemas urbanos.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PÁGINA DO MÓDULO -->
+    <div id="modulo-pagina" class="modulo-pagina">
+      <button class="btn-voltar" onclick="voltarLista()"><i class="fas fa-arrow-left"></i> Voltar à lista</button>
+      <div id="modulo-conteudo"></div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>
+        <span class="logo-geo">GEO</span><span class="logo-x">-X</span>
+        &nbsp;—&nbsp; Powered by <span class="powered">M4L!K</span>
+        &nbsp;—&nbsp; IDEA: <span class="powered">RAYKING👑</span>
+      </p>
+      <p style="color:var(--geo-muted);font-size:0.7rem;margin-top:0.3rem;">Ferramenta educativa de Geografia — 12ª Classe</p>
+    </footer>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCRIPTS
+  ═══════════════════════════════════════ -->
+  <script>
+    // ============================================================
+    //  MENU CIRCULAR — VERSÃO CORRIGIDA
+    // ============================================================
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+      // Menu circular
+      const menuToggleBtn = document.getElementById('menuToggleBtn');
+      const menuCloseBtn = document.getElementById('menuCloseBtn');
+      const menuOverlay = document.getElementById('menuOverlay');
+      const menuContainer = document.getElementById('menuContainer');
+      const menuKnob = document.getElementById('menuKnob');
+      const geoMenu = document.getElementById('geoMenu');
+
+      function abrirMenu() {
+        menuOverlay.classList.add('active');
+        menuContainer.classList.add('active');
+        geoMenu.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function fecharMenu() {
+        menuOverlay.classList.remove('active');
+        menuContainer.classList.remove('active');
+        geoMenu.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      if (menuToggleBtn) {
+        menuToggleBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (menuContainer.classList.contains('active')) {
+            fecharMenu();
+          } else {
+            abrirMenu();
+          }
+        });
+      }
+
+      if (menuCloseBtn) {
+        menuCloseBtn.addEventListener('click', fecharMenu);
+      }
+
+      if (menuOverlay) {
+        menuOverlay.addEventListener('click', fecharMenu);
+      }
+
+      if (menuKnob) {
+        menuKnob.addEventListener('click', function(e) {
+          e.stopPropagation();
+          geoMenu.classList.toggle('active');
+        });
+      }
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          fecharMenu();
+        }
+      });
+
+      document.querySelectorAll('.geo-menu li button').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          setTimeout(fecharMenu, 300);
+        });
+      });
+
+      // Tema
+      let temaEscuro = true;
+
+      window.toggleTheme = function() {
+        temaEscuro = !temaEscuro;
+        document.body.classList.toggle('light-mode', !temaEscuro);
+        const icon = document.querySelector('#themeToggle i');
+        if (temaEscuro) {
+          icon.className = 'fas fa-moon';
+        } else {
+          icon.className = 'fas fa-sun';
+        }
+      };
+
+      // Voltar MATHX
+      window.voltarMathX = function() {
+        window.location.href = 'index.html';
+      };
+
+      // Voltar lista
+      window.voltarLista = function() {
+        document.getElementById('modulo-lista').style.display = 'block';
+        document.getElementById('modulo-pagina').classList.remove('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      // Abrir módulo
+      window.abrirModulo = function(id) {
+        const lista = document.getElementById('modulo-lista');
+        const pagina = document.getElementById('modulo-pagina');
+        const conteudo = document.getElementById('modulo-conteudo');
+
+        lista.style.display = 'none';
+        pagina.classList.add('active');
+
+        switch (id) {
+          case 'unidade1':
+            conteudo.innerHTML = renderUnidade1();
+            break;
+          case 'unidade2':
+            conteudo.innerHTML = renderUnidade2();
+            break;
+          case 'unidade3':
+            conteudo.innerHTML = renderUnidade3();
+            break;
+          case 'unidade4':
+            conteudo.innerHTML = renderUnidade4();
+            break;
+          case 'unidade5':
+            conteudo.innerHTML = renderUnidade5();
+            break;
+          case 'unidade6':
+            conteudo.innerHTML = renderUnidade6();
+            break;
+          default:
+            conteudo.innerHTML =
+              '<div class="modulo-container"><h3 style="color:var(--geo-green);">Unidade em desenvolvimento</h3><p style="color:var(--geo-muted);">Brevemente disponível.</p></div>';
+        }
+
+        const primeiroTab = document.querySelector('.tab-btn.active');
+        if (primeiroTab) {
+          const targetId = primeiroTab.dataset.target;
+          document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+          const target = document.getElementById(targetId);
+          if (target) target.classList.add('active');
+        }
+
+        setTimeout(function() {
+          if (document.getElementById('geo-flashcard-front')) {
+            carregarFlashcardGeo(0);
+          }
+        }, 100);
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      // Switch Tab
+      window.switchTab = function(btn, targetId) {
+        const parent = btn.closest('.inner-tabs');
+        if (!parent) return;
+        parent.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        const container = btn.closest('.modulo-container');
+        if (container) {
+          container.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+          const target = document.getElementById(targetId);
+          if (target) target.classList.add('active');
+        }
+      };
+
+      // Verificar exercício
+      window.verificarGeo = function(btn, correta) {
+        const container = btn.closest('.geo-exercicio');
+        const selected = container.querySelector('input[type="radio"]:checked');
+        const feedback = container.querySelector('.resposta-feedback');
+
+        if (!selected) {
+          feedback.textContent = '⚠ Selecciona uma opção primeiro!';
+          feedback.className = 'resposta-feedback';
+          feedback.style.color = '#ff6b6b';
+          return;
+        }
+
+        if (selected.value === correta) {
+          feedback.textContent = '✅ Correto!';
+          feedback.className = 'resposta-feedback correto';
+        } else {
+          feedback.textContent = '❌ Incorreto. Tenta novamente!';
+          feedback.className = 'resposta-feedback errado';
+        }
+      };
+
+      // Flashcard
+      let flashcardGeoAtual = 0;
+      let flashcardGeoVirado = false;
+      var geoFlashcards = [];
+
+      window.carregarFlashcardGeo = function(index) {
+        const card = geoFlashcards[index];
+        if (!card) return;
+        document.getElementById('geo-flashcard-front').textContent = card.frente;
+        document.getElementById('geo-flashcard-back').textContent = card.verso;
+        document.getElementById('geo-flashcard-inner').classList.remove('flipped');
+        flashcardGeoVirado = false;
+        document.getElementById('geo-flashcard-counter').textContent = index + 1 + ' / ' + geoFlashcards.length;
+      };
+
+      window.virarFlashcardGeo = function() {
+        const inner = document.getElementById('geo-flashcard-inner');
+        flashcardGeoVirado = !flashcardGeoVirado;
+        if (flashcardGeoVirado) {
+          inner.classList.add('flipped');
+        } else {
+          inner.classList.remove('flipped');
+        }
+      };
+
+      window.flashcardGeoAnterior = function() {
+        if (flashcardGeoAtual > 0) {
+          flashcardGeoAtual--;
+          carregarFlashcardGeo(flashcardGeoAtual);
+        }
+      };
+
+      window.flashcardGeoProximo = function() {
+        if (flashcardGeoAtual < geoFlashcards.length - 1) {
+          flashcardGeoAtual++;
+          carregarFlashcardGeo(flashcardGeoAtual);
+        }
+      };
+
+      // Quiz
+      const geoPerguntas = [
+        { pergunta: 'O que é o crescimento natural da população?', opcoes: ['Soma da natalidade e mortalidade',
+            'Diferença entre natalidade e mortalidade', 'Soma do saldo migratório',
+            'Diferença entre imigrantes e emigrantes'
+          ], correta: 1 },
+        { pergunta: 'Qual destas NÃO é uma área de grande concentração populacional?', opcoes: ['Ásia Meridional',
+            'Europa Ocidental', 'Nordeste dos EUA', 'Regiões polares'
+          ], correta: 3 },
+        { pergunta: 'O que é a taxa de fecundidade?', opcoes: ['Total de nascimentos num lugar',
+            'Nascimentos por 1000 mulheres em idade fértil', 'Total de mortes num lugar',
+            'Diferença entre nascimentos e mortes'
+          ], correta: 1 },
+        { pergunta: 'A doutrina de Malthus defende:', opcoes: ['Estimular a natalidade',
+            'Limitar voluntariamente os nascimentos', 'Aumentar a imigração', 'Reduzir a mortalidade'
+          ], correta: 1 },
+        { pergunta: 'O êxodo rural é caracterizado por:', opcoes: ['Migração do campo para a cidade',
+            'Migração da cidade para o campo', 'Migração entre países', 'Migração temporária'
+          ], correta: 0 },
+        { pergunta: 'Nos países desenvolvidos, a política demográfica tende a ser:', opcoes: ['Anti natalista',
+            'Natalista', 'Indiferente', 'Restritiva'
+          ], correta: 1 },
+      ];
+
+      let geoQuizAtual = 0;
+      let geoQuizScore = 0;
+      let geoQuizTotal = 0;
+      let geoQuizAtivo = false;
+      let geoQuizTimer = null;
+      let geoQuizTempo = 15;
+      let geoPerguntaAtual = null;
+
+      window.iniciarGeoQuiz = function() {
+        geoQuizAtual = 0;
+        geoQuizScore = 0;
+        geoQuizTotal = 0;
+        geoQuizAtivo = true;
+        document.getElementById('geo-btn-cancelar').style.display = 'inline-flex';
+        mostrarGeoPergunta();
+      };
+
+      window.cancelarGeoQuiz = function() {
+        geoQuizAtivo = false;
+        clearInterval(geoQuizTimer);
+        document.getElementById('geo-btn-cancelar').style.display = 'none';
+        const perguntaEl = document.getElementById('geo-quiz-pergunta');
+        perguntaEl.innerHTML = '<span style="color:var(--geo-muted);">Quiz cancelado.</span>';
+        document.getElementById('geo-quiz-resultado').innerHTML = '';
+      };
+
+      function mostrarGeoPergunta() {
+        if (!geoQuizAtivo || geoQuizAtual >= geoPerguntas.length) {
+          terminarGeoQuiz();
+          return;
+        }
+
+        const q = geoPerguntas[geoQuizAtual];
+        geoPerguntaAtual = q;
+        geoQuizTotal++;
+
+        const perguntaEl = document.getElementById('geo-quiz-pergunta');
+        perguntaEl.innerHTML =
+          '<div style="font-weight:700;color:var(--geo-cream);margin-bottom:0.5rem;">Pergunta ' + (geoQuizAtual + 1) +
+          '/' + geoPerguntas.length +
+          '</div><div style="color:var(--geo-cream);margin-bottom:0.8rem;">' + q.pergunta +
+          '</div><div style="display:flex;flex-direction:column;gap:0.4rem;">';
+        q.opcoes.forEach(function(op, i) {
+          perguntaEl.innerHTML +=
+            '<label style="color:var(--geo-cream);cursor:pointer;"><input type="radio" name="geo-quiz-opcao" value="' +
+            i + '" style="accent-color:var(--geo-green);margin-right:0.5rem;"> ' + op + '</label>';
+        });
+        perguntaEl.innerHTML +=
+          '</div><button class="btn-verificar" onclick="responderGeoQuiz()" style="margin-top:0.8rem;">Responder</button><span style="display:block;margin-top:0.4rem;font-size:0.75rem;color:var(--geo-muted);">⏱️ ' +
+          geoQuizTempo + 's</span>';
+
+        geoQuizTempo = 15;
+        clearInterval(geoQuizTimer);
+        geoQuizTimer = setInterval(function() {
+          geoQuizTempo--;
+          var tempoEl = perguntaEl.querySelector('span:last-child');
+          if (tempoEl) tempoEl.textContent = '⏱️ ' + geoQuizTempo + 's';
+          if (geoQuizTempo <= 0) {
+            clearInterval(geoQuizTimer);
+            responderGeoQuiz(true);
+          }
+        }, 1000);
+      }
+
+      window.responderGeoQuiz = function(tempoEsgotado) {
+        clearInterval(geoQuizTimer);
+        const perguntaEl = document.getElementById('geo-quiz-pergunta');
+        const selected = perguntaEl.querySelector('input[type="radio"]:checked');
+
+        var correto = false;
+        var msg = '';
+
+        if (tempoEsgotado) {
+          msg = '⏰ Tempo esgotado! Resposta: ' + geoPerguntaAtual.opcoes[geoPerguntaAtual.correta];
+        } else if (!selected) {
+          msg = '⚠ Selecciona uma opção!';
+          document.getElementById('geo-quiz-resultado').innerHTML = '<div style="color:#ff6b6b;">' + msg + '</div>';
+          return;
+        } else {
+          var escolha = parseInt(selected.value);
+          correto = escolha === geoPerguntaAtual.correta;
+          if (correto) {
+            geoQuizScore++;
+            msg = '✅ Correto! +1 ponto';
+          } else {
+            msg = '❌ Incorreto. Resposta: ' + geoPerguntaAtual.opcoes[geoPerguntaAtual.correta];
+          }
+        }
+
+        document.getElementById('geo-quiz-resultado').innerHTML =
+          '<div style="color:' + (correto || tempoEsgotado ? 'var(--geo-green)' : '#ff6b6b') + ';">' + msg + '</div>';
+        document.getElementById('geo-quiz-score').textContent = geoQuizScore;
+        document.getElementById('geo-quiz-total').textContent = geoQuizTotal;
+
+        geoQuizAtual++;
+        setTimeout(function() {
+          document.getElementById('geo-quiz-resultado').innerHTML = '';
+          mostrarGeoPergunta();
+        }, 1500);
+      };
+
+      function terminarGeoQuiz() {
+        geoQuizAtivo = false;
+        document.getElementById('geo-btn-cancelar').style.display = 'none';
+        const perguntaEl = document.getElementById('geo-quiz-pergunta');
+        perguntaEl.innerHTML =
+          '<div style="text-align:center;"><span style="font-size:1.2rem;color:var(--geo-green);font-weight:700;">🏆 Quiz terminado!</span><div style="margin-top:0.5rem;color:var(--geo-cream);">Pontuação: <strong style="color:var(--geo-green);">' +
+          geoQuizScore + '</strong> / ' + geoQuizTotal +
+          '</div><div style="margin-top:0.3rem;font-size:0.85rem;color:var(--geo-muted);">' +
+          (geoQuizScore >= 5 ? 'Excelente! 👏' : geoQuizScore >= 3 ? 'Bom trabalho! 💪' : 'Continua a estudar! 📚') +
+          '</div></div>';
+      }
+
+      // ============================================================
+      //  CONTEÚDO DAS UNIDADES
+      // ============================================================
+
+      // FLASHCARDS GLOBAIS
+      const geoFlashcardsData = [
+        { frente: 'O que é ecúmena?', verso: 'Áreas permanentemente habitadas.' },
+        { frente: 'O que é natalidade?', verso: 'Total de nascimentos verificados num determinado lugar.' },
+        { frente: 'O que é fecundidade?', verso: 'Total de nascimentos por 1000 mulheres em idade de procriar.' },
+        { frente: 'O que é mortalidade?', verso: 'Total de mortes verificadas num determinado lugar.' },
+        { frente: 'O que é crescimento natural?', verso: 'Diferença entre a natalidade e a mortalidade.' },
+        { frente: 'O que é saldo migratório?', verso: 'Diferença entre imigrantes e emigrantes.' },
+        { frente: 'O que é êxodo rural?', verso: 'Saída massiva de pessoas das áreas rurais para as urbanas.' },
+        { frente: 'O que defende a doutrina de Malthus?', verso: 'A limitação voluntária de nascimentos.' },
+        { frente: 'O que é uma política natalista?', verso: 'Política que estimula o aumento de nascimentos.' },
+        { frente: 'O que é uma pirâmide etária?', verso: 'Representação gráfica da estrutura etária da população.' },
+        { frente: 'O que é população activa?', verso: 'Pessoas em idade de trabalhar (15-64 anos).' },
+        { frente: 'O que é esperança de vida?', verso: 'Idade média que uma pessoa pode viver.' }
+      ];
+
+      // UNIDADE 1
+      window.renderUnidade1 = function() {
+        return gerarHTMLUnidade('1', 'População', 'users', dadosUnidade1);
+      };
+
+      // UNIDADE 2
+      window.renderUnidade2 = function() {
+        return gerarHTMLUnidade('2', 'Agricultura e Pecuária', 'seedling', dadosUnidade2);
+      };
+
+      // UNIDADE 3
+      window.renderUnidade3 = function() {
+        return gerarHTMLUnidade('3', 'Indústria e Comércio', 'industry', dadosUnidade3);
+      };
+
+      // UNIDADE 4
+      window.renderUnidade4 = function() {
+        return gerarHTMLUnidade('4', 'Turismo', 'umbrella-beach', dadosUnidade4);
+      };
+
+      // UNIDADE 5
+      window.renderUnidade5 = function() {
+        return gerarHTMLUnidade('5', 'Transportes e Comunicações', 'train', dadosUnidade5);
+      };
+
+      // UNIDADE 6
+      window.renderUnidade6 = function() {
+        return gerarHTMLUnidade('6', 'Urbanismo', 'city', dadosUnidade6);
+      };
+
+      // DADOS UNIDADE 1
+      var dadosUnidade1 = {
+        sintese: [
+          { titulo: '📍 Distribuição da População',
+            conteudo: 'Áreas de grande concentração: Ásia Meridional e Sudeste, Europa Ocidental, Nordeste dos EUA. Vazios humanos: regiões montanhosas, florestas tropicais, regiões polares e subpolares. Factores naturais: clima, solo, relevo, vegetação, riqueza do subsolo, bacias hidrográficas. Factores humanos: vias de comunicação, indústrias, civilizações antigas.' },
+          { titulo: '📈 Crescimento Populacional',
+            conteudo: 'Natalidade: total de nascimentos num lugar. Fecundidade: nascimentos por 1000 mulheres em idade fértil. Mortalidade: total de mortes num lugar. Crescimento natural: natalidade − mortalidade. Crescimento efectivo: crescimento natural + saldo migratório.' },
+          { titulo: '🚶 Migrações',
+            conteudo: 'Temporárias vs definitivas; internas vs externas. Causas naturais: sismos, secas, inundações. Causas humanas: económicas, políticas, étnicas, religiosas.' },
+          { titulo: '📚 Teorias Demográficas',
+            conteudo: 'Malthusiana (anti natalista): defende a limitação voluntária de nascimentos. Anti malthusiana (natalista): defende que a pobreza resulta da má distribuição de riquezas.' },
+          { titulo: '🏛️ Estrutura da População',
+            conteudo: 'Pirâmides etárias: jovem (base larga), adulta, velha (topo largo). Sectores de actividade: Primário (agricultura), Secundário (indústria), Terciário (serviços).' },
+          { titulo: '⚠️ Problemas Demográficos',
+            conteudo: 'Desigualdades alimentares, desemprego, má nutrição, analfabetismo, falta de habitação.' }
+        ],
+        exercicios: [{
+          pergunta: 'Identifique as áreas de grande concentração da população.',
+          opcoes: ['América do Sul, África Central e Austrália',
+            'Ásia Meridional e Sudeste, Europa Ocidental, Nordeste dos EUA',
+            'América do Norte, Europa Oriental e Ásia Central', 'África do Sul, Brasil e Índia'
+          ],
+          correta: 'B'
+        }, {
+          pergunta: 'O que é o crescimento natural da população?',
+          opcoes: ['Soma da natalidade e da mortalidade', 'Diferença entre natalidade e mortalidade',
+            'Soma do saldo migratório e da mortalidade', 'Diferença entre imigrantes e emigrantes'
+          ],
+          correta: 'B'
+        }, {
+          pergunta: 'Qual é a principal característica do regime demográfico primitivo?',
+          opcoes: ['Altas taxas de natalidade e baixa mortalidade', 'Baixas taxas de natalidade e alta mortalidade',
+            'Altas taxas de natalidade e mortalidade, crescimento lento',
+            'Baixas taxas de natalidade e mortalidade, crescimento rápido'
+          ],
+          correta: 'C'
+        }, {
+          pergunta: 'A doutrina de Malthus defende que:',
+          opcoes: ['O crescimento populacional é benéfico para a economia',
+            'A pobreza resulta da má distribuição de riquezas',
+            'O rápido crescimento populacional é um perigo para o equilíbrio económico',
+            'A natalidade deve ser estimulada'
+          ],
+          correta: 'C'
+        }, {
+          pergunta: 'O êxodo rural é:',
+          opcoes: ['A migração de pessoas das cidades para o campo',
+            'A saída massiva de pessoas das áreas rurais para as urbanas', 'A migração de pessoas entre países',
+            'A migração temporária de trabalhadores'
+          ],
+          correta: 'B'
+        }],
+        solucoes: ['B — Ásia Meridional e Sudeste, Europa Ocidental, Nordeste dos EUA',
+          'B — Diferença entre natalidade e mortalidade',
+          'C — Altas taxas de natalidade e mortalidade, crescimento lento',
+          'C — O rápido crescimento populacional é um perigo para o equilíbrio económico',
+          'B — A saída massiva de pessoas das áreas rurais para as urbanas'
+        ],
+        timeline: [
+          { ano: 'Pré-Industrial', desc: 'Regime demográfico primitivo: altas taxas de natalidade e mortalidade.' },
+          { ano: 'Séc. XVIII-XIX', desc: 'Revolução Industrial: redução da mortalidade nos países desenvolvidos.' },
+          { ano: '1914-1918', desc: 'I Guerra Mundial: abrandamento do crescimento na Europa.' },
+          { ano: '1945-1960', desc: 'Baby Boom: explosivo crescimento da natalidade nos países industrializados.' },
+          { ano: '1960-presente', desc: 'Explosão demográfica nos países em desenvolvimento.' },
+          { ano: '1970-presente', desc: 'Declínio da fecundidade nos países desenvolvidos.' },
+          { ano: 'Anos 2000', desc: 'Envelhecimento populacional na Europa e Japão.' },
+          { ano: 'Actualidade', desc: 'Desigualdades demográficas entre Norte e Sul global.' }
+        ]
+      };
+
+      // DADOS UNIDADE 2
+      var dadosUnidade2 = {
+        sintese: [
+          { titulo: '🌾 Evolução da Agricultura',
+            conteudo: 'Focos de surgimento: Mesopotâmia, México/Perú, Vale do Nilo (Egipto). Revolução agrícola do Neolítico: sedentarização, aumento populacional, instrumentos aperfeiçoados. Idade Média: sistema de rotação trienal, grandes domínios (Francos e Germânicos). Modernização: a partir do século XIX, com diversificação de culturas, adubos e maquinaria.' },
+          { titulo: '🌍 Espaço Agrário',
+            conteudo: 'Definição: espaço geográfico com condições naturais favoráveis para a agro-pecuária. Factores naturais: clima (temperatura e precipitação), relevo, solo, vegetação. Factores humanos: tecnologia, mão-de-obra, políticas agrárias, mercado.' },
+          { titulo: '🚜 Sistemas Agrários',
+            conteudo: 'Tradicional (subsistência): tecnologia rudimentar, baixa produtividade, agricultura itinerante. Moderna: científica, mecanizada, especializada, virada para o mercado. Agricultura sedentária de sequeiro: depende da chuva, associada à criação de gado. Agricultura irrigada: oásis, Ásia das Monções (cultura do arroz).' },
+          { titulo: '🐄 Pecuária',
+            conteudo: 'Extensiva: gado à solta, poucos cuidados, baixa produtividade. Intensiva: gado em estábulos, alimentação controlada, alta produtividade. Regiões de destaque: América do Norte, Europa Ocidental, Oceânia, América do Sul.' },
+          { titulo: '⚠️ Problemas Ambientais',
+            conteudo: 'Degradação dos solos: monocultura, pastoreio excessivo, queimadas. Agricultura biológica: alternativa sustentável, sem produtos químicos, com rotação de culturas.' }
+        ],
+        exercicios: [{
+          pergunta: 'Quais foram os principais focos de surgimento da agricultura?',
+          opcoes: ['China, Índia e Japão', 'Mesopotâmia, México/Perú, Vale do Nilo',
+            'Europa Ocidental, América do Norte, Austrália', 'África Central, Brasil, Indonésia'
+          ],
+          correta: 'B'
+        }, {
+          pergunta: 'O que caracteriza a agricultura tradicional?',
+          opcoes: ['Tecnologia avançada e alta produtividade', 'Agricultura de subsistência e tecnologia rudimentar',
+            'Produção virada para a exportação', 'Uso intensivo de fertilizantes químicos'
+          ],
+          correta: 'B'
+        }, {
+          pergunta: 'O que é a agricultura itinerante?',
+          opcoes: ['Agricultura fixa num mesmo local', 'Sistema de rotação de culturas com pousio',
+            'Deslocação em busca de solos férteis com queimadas', 'Agricultura irrigada com adubação permanente'
+          ],
+          correta: 'C'
+        }],
+        solucoes: ['B — Mesopotâmia, México/Perú, Vale do Nilo',
+          'B — Agricultura de subsistência e tecnologia rudimentar',
+          'C — Deslocação em busca de solos férteis com queimadas'
+        ],
+        timeline: [
+          { ano: 'c. 8000 a.C.', desc: 'Revolução Neolítica: surgimento da agricultura e sedentarização.' },
+          { ano: 'c. 4000 a.C.', desc: 'Utilização do ferro, arado, aumento da produção.' },
+          { ano: 'Idade Média', desc: 'Sistema de rotação trienal, grandes domínios feudais.' },
+          { ano: 'Séc. XIX', desc: 'Modernização agrícola: adubos, maquinaria, diversificação.' },
+          { ano: 'Séc. XX', desc: 'Revolução Verde: variedades de alto rendimento, fertilizantes.' },
+          { ano: 'Actualidade', desc: 'Agricultura biológica, sustentabilidade, tecnologia digital.' }
+        ]
+      };
+
+      // DADOS UNIDADE 3
+      var dadosUnidade3 = {
+        sintese: [
+          { titulo: '🏭 Evolução da Indústria',
+            conteudo: 'Artesanal (Paleolítico à Idade Média): produção familiar, corporações de ofícios. Manufactureira (séc. XVI): trabalho colectivo, divisão de tarefas, operário especializado. Revolução Industrial (séc. XVIII): máquina a vapor, indústria têxtil, transportes.' },
+          { titulo: '⚙️ Fases da Revolução Industrial',
+            conteudo: '1ª fase: máquina a vapor, carvão mineral, localização junto às bacias carboníferas. 2ª fase: petróleo, electricidade, maior dispersão industrial. 3ª fase: automação, informática, novas energias (solar, eólica, geotérmica).' },
+          { titulo: '📦 Tipos de Indústria',
+            conteudo: 'Bens de equipamento (pesadas): fornecem materiais a outras indústrias (metalúrgica, automobilística). Bens de consumo (ligeiras): produzem bens para uso directo (têxtil, alimentar). Indústrias de ponta: alta tecnologia (aerospacial, electrónica).' },
+          { titulo: '🌍 Comércio Internacional',
+            conteudo: 'Desigualdades: matérias-primas (países pobres) desvalorizadas face a produtos manufacturados (países ricos). Fluxos: produtos agrícolas (Sul → Norte), petróleo (Médio Oriente → mundo). Multinacionais: reforçam o poder dos países desenvolvidos.' }
+        ],
+        exercicios: [{
+          pergunta: 'O que caracterizou a primeira fase da Revolução Industrial?',
+          opcoes: ['Automação e informática', 'Máquina a vapor e carvão mineral', 'Petróleo e electricidade',
+            'Energia solar e eólica'
+          ],
+          correta: 'B'
+        }, {
+          pergunta: 'As indústrias de bens de equipamento são importantes porque:',
+          opcoes: ['Produzem bens para consumo directo', 'Constituem o suporte da estrutura produtiva de um país',
+            'São as mais difundidas no mundo', 'Não poluem o ambiente'
+          ],
+          correta: 'B'
+        }, {
+          pergunta: 'O que explica as desigualdades no comércio mundial?',
+          opcoes: ['A alta qualidade dos produtos dos países pobres',
+            'A desvalorização das matérias-primas face aos produtos manufacturados',
+            'O equilíbrio entre importações e exportações', 'A abundância de recursos em todos os países'
+          ],
+          correta: 'B'
+        }],
+        solucoes: ['B — Máquina a vapor e carvão mineral',
+          'B — Constituem o suporte da estrutura produtiva de um país',
+          'B — A desvalorização das matérias-primas face aos produtos manufacturados'
+        ],
+        timeline: [
+          { ano: 'Séc. XVIII', desc: '1ª Revolução Industrial — máquina a vapor, carvão, têxtil.' },
+          { ano: 'Séc. XIX', desc: '2ª Revolução Industrial — petróleo, electricidade, aço.' },
+          { ano: 'Séc. XX', desc: '3ª Revolução Industrial — automação, informática.' },
+          { ano: 'Séc. XXI', desc: 'Indústria 4.0 — IA, robótica, sustentabilidade.' }
+        ]
+      };
+
+      // DADOS UNIDADE 4
+      var dadosUnidade4 = {
+        sintese: [
+          { titulo: '🏖️ Conceito e Tipos de Turismo',
+            conteudo: 'Turismo: actividades realizadas durante viagens e permanência em locais distintos da residência, por período inferior a 1 ano, com fins de lazer, negócios, etc. Tipos: cultural, desportivo, recreativo, religioso, ambiental. Modos: receptivo (entrada de turistas), emissivo (saída), doméstico (interno).' },
+          { titulo: '💶 Importância do Turismo',
+            conteudo: 'Gera rendimentos individuais e empresariais, proporciona divisas, origina receitas fiscais, valoriza imóveis, impulsiona a construção civil.' },
+          { titulo: '🏛️ Património Turístico Mundial',
+            conteudo: 'Natural: praias, grutas, montanhas, florestas. Cultural: monumentos, fortalezas, igrejas, sítios arqueológicos. Bacias turísticas: Europa (Mediterrâneo), América (EUA, México, Caraíbas), Ásia-Pacífico (Japão, Austrália).' },
+          { titulo: '⚠️ Impactos Ambientais',
+            conteudo: 'Positivos: conservação de animais ameaçados, valorização do património. Negativos: poluição, degradação de ecossistemas, uso inadequado de recursos.' }
+        ],
+        exercicios: [{
+          pergunta: 'O que é o turismo receptivo?',
+          opcoes: ['Saída de turistas para outros países', 'Entrada de turistas estrangeiros',
+            'Turismo praticado dentro do próprio país', 'Turismo de negócios'
+          ],
+          correta: 'B'
+        }, {
+          pergunta: 'Qual destas NÃO é uma bacia turística mundial?',
+          opcoes: ['Europa (Mediterrâneo)', 'América (EUA, México, Caraíbas)',
+            'Ásia-Pacífico (Japão, Austrália)', 'África Central (Congo, Angola)'
+          ],
+          correta: 'D'
+        }, {
+          pergunta: 'Um impacto ambiental positivo do turismo é:',
+          opcoes: ['A degradação dos recursos naturais', 'A conservação de animais ameaçados',
+            'A poluição sonora', 'O aumento da criminalidade'
+          ],
+          correta: 'B'
+        }],
+        solucoes: ['B — Entrada de turistas estrangeiros', 'D — África Central não é uma bacia turística principal',
+          'B — A conservação de animais ameaçados'
+        ],
+        timeline: [
+          { ano: 'Antiguidade', desc: 'Viagens por motivos religiosos e comerciais.' },
+          { ano: 'Séc. XIX', desc: 'Surgimento do turismo moderno com transportes ferroviários e marítimos.' },
+          { ano: 'Séc. XX', desc: 'Expansão do turismo de massa, aviação comercial.' },
+          { ano: 'Actualidade', desc: 'Turismo global, sustentabilidade, impacto ambiental.' }
+        ]
+      };
+
+      // DADOS UNIDADE 5
+      var dadosUnidade5 = {
+        sintese: [
+          { titulo: '🚂 Evolução dos Transportes',
+            conteudo: 'Antes da Revolução Industrial: transporte a pé, tracção animal, navegação à vela. 1ª fase (séc. XVIII): máquina a vapor (ferrovia, navios a vapor). 2ª fase (séc. XX): máquina a diesel, petróleo, automóvel, avião. Factores naturais: relevo, clima, hidrografia.' },
+          { titulo: '🚗 Tipos de Transporte',
+            conteudo: 'Rodoviário: flexível, grande mobilidade, mas poluente e sinistralidade elevada. Ferroviário: grande capacidade, seguro, mas rígido nos itinerários. Marítimo: baixo custo, grande volume, mas lento. Aéreo: rápido, mas caro e poluente.' },
+          { titulo: '📡 Comunicações',
+            conteudo: 'Evolução: tambor → carta → telégrafo → telefone → rádio → televisão → internet → fibra óptica. Sistemas: rádio, televisão, telefone, fax, videoconferência, e-mail, telemóvel.' },
+          { titulo: '🌍 Impacto Ambiental',
+            conteudo: 'Poluição atmosférica: gases de estufa (CO₂, NOx, SO₂) — 23% das emissões relacionadas com energia. Poluição da água: derrames de petróleo, resíduos de óleos. Poluição sonora: especialmente em áreas urbanas.' }
+        ],
+        exercicios: [{
+          pergunta: 'Qual foi o impacto da máquina a vapor nos transportes?',
+          opcoes: ['Permitiu o desenvolvimento da ferrovia e navegação a vapor', 'Substituiu o automóvel',
+            'Reduziu a poluição', 'Apenas afectou o transporte aéreo'
+          ],
+          correta: 'A'
+        }, {
+          pergunta: 'Uma vantagem do transporte rodoviário é:',
+          opcoes: ['Baixo consumo de combustível', 'Grande flexibilidade e mobilidade', 'Baixa sinistralidade',
+            'Baixo custo por tonelada'
+          ],
+          correta: 'B'
+        }, {
+          pergunta: 'O sector dos transportes é responsável por cerca de ___% das emissões de gases de efeito estufa relacionadas com energia.',
+          opcoes: ['10%', '23%', '50%', '70%'],
+          correta: 'B'
+        }],
+        solucoes: ['A — Permitiu o desenvolvimento da ferrovia e navegação a vapor',
+          'B — Grande flexibilidade e mobilidade', 'B — 23% das emissões de gases de efeito estufa'
+        ],
+        timeline: [
+          { ano: 'Até séc. XVIII', desc: 'Transporte a pé, tracção animal, navegação à vela.' },
+          { ano: 'Séc. XIX', desc: 'Máquina a vapor, ferrovia, navios a vapor.' },
+          { ano: 'Séc. XX', desc: 'Automóvel, avião, máquina a diesel.' },
+          { ano: 'Séc. XXI', desc: 'Transportes elétricos, autónomos, sustentáveis.' }
+        ]
+      };
+
+      // DADOS UNIDADE 6
+      var dadosUnidade6 = {
+        sintese: [
+          { titulo: '🏙️ Conceito de Cidade',
+            conteudo: 'Não existe uma definição universal. Cada país adopta critérios próprios (demográficos, funcionais). Características: concentração de habitat, predominância de actividades secundárias e terciárias.' },
+          { titulo: '📜 Evolução das Cidades',
+            conteudo: 'Jericó: cidade mais antiga (c. 2500 a.C.). Idade Média: retrocesso urbano devido ao sistema feudal (economia rural). Séc. XVIII: Revolução Industrial → expansão urbana expressiva. Actualidade: elevadas taxas de urbanização, especialmente nos países em desenvolvimento.' },
+          { titulo: '🏛️ Funções da Cidade',
+            conteudo: 'Político-administrativa: capitais, sedes de governo. Industrial: centros fabris. Comercial: pólos de troca. Cultural: universidades, museus. Religiosa: Meca, Jerusalém, Roma. Turística: destinos de lazer.' },
+          { titulo: '🔄 Relações Cidade-Campo',
+            conteudo: 'Interdependência nos domínios agrícola, comercial, financeiro, saúde, demográfico e cultural.' },
+          { titulo: '⚠️ Problemas Urbanos',
+            conteudo: 'Trânsito, abastecimento (água, energia, alimentos), poluição (atmosférica, sonora, sólida) e saturação demográfica. Consequências: desemprego, subemprego, miséria, delinquência, degradação ambiental.' }
+        ],
+        exercicios: [{
+          pergunta: 'Qual é a cidade mais antiga do mundo?',
+          opcoes: ['Babilónia', 'Jericó', 'Ur', 'Meca'],
+          correta: 'B'
+        }, {
+          pergunta: 'O que provocou o retrocesso urbano na Idade Média?',
+          opcoes: ['A Revolução Industrial', 'O sistema feudal e a economia rural de subsistência', 'A peste negra',
+            'As cruzadas'
+          ],
+          correta: 'B'
+        }, {
+          pergunta: 'A cidade de Meca desempenha principalmente uma função:',
+          opcoes: ['Industrial', 'Comercial', 'Religiosa', 'Turística'],
+          correta: 'C'
+        }],
+        solucoes: ['B — Jericó (c. 2500 a.C.)', 'B — O sistema feudal e a economia rural de subsistência',
+          'C — Religiosa'
+        ],
+        timeline: [
+          { ano: 'c. 2500 a.C.', desc: 'Jericó — cidade mais antiga.' },
+          { ano: 'Idade Média', desc: 'Retrocesso urbano devido ao feudalismo.' },
+          { ano: 'Séc. XVIII', desc: 'Revolução Industrial — crescimento urbano expressivo.' },
+          { ano: 'Séc. XX', desc: 'Urbanização acelerada em todo o mundo.' },
+          { ano: 'Actualidade', desc: 'Megacidades, problemas ambientais e sociais.' }
+        ]
+      };
+
+      // GERAR HTML UNIDADE
+      function gerarHTMLUnidade(num, titulo, icone, dados) {
+        var id = 'unidade' + num;
+        var sinteseId = 'geo' + num + '-sintese';
+        var exerciciosId = 'geo' + num + '-exercicios';
+        var solucoesId = 'geo' + num + '-solucoes';
+        var quizId = 'geo' + num + '-quiz';
+        var flashcardsId = 'geo' + num + '-flashcards';
+        var timelineId = 'geo' + num + '-timeline';
+        var mapaId = 'geo' + num + '-mapa';
+
+        // Guardar flashcards
+        geoFlashcards = geoFlashcardsData;
+
+        var html = '';
+        html += '<div class="modulo-container" data-unidade="' + id + '">';
+        html += '<div class="card-header">';
+        html += '<i class="fas fa-' + icone + '" style="font-size:1.6rem;color:var(--geo-sand);"></i>';
+        html += '<h2 style="color:var(--geo-green);">Unidade ' + num + ': ' + titulo + '</h2>';
+        html += '</div>';
+
+        html += '<div class="inner-tabs">';
+        html += '<button class="tab-btn active" data-target="' + sinteseId + '" onclick="switchTab(this, \'' + sinteseId +
+          '\')">📖 Síntese</button>';
+        html += '<button class="tab-btn" data-target="' + exerciciosId + '" onclick="switchTab(this, \'' + exerciciosId +
+          '\')">✍️ Exercícios</button>';
+        html += '<button class="tab-btn" data-target="' + solucoesId + '" onclick="switchTab(this, \'' + solucoesId +
+          '\')">✅ Soluções</button>';
+        html += '<button class="tab-btn" data-target="' + quizId + '" onclick="switchTab(this, \'' + quizId +
+          '\')">🧠 Quiz</button>';
+        html += '<button class="tab-btn" data-target="' + flashcardsId + '" onclick="switchTab(this, \'' + flashcardsId +
+          '\')">🃏 Flashcards</button>';
+        html += '<button class="tab-btn" data-target="' + timelineId + '" onclick="switchTab(this, \'' + timelineId +
+          '\')">📅 Timeline</button>';
+        html += '<button class="tab-btn" data-target="' + mapaId + '" onclick="switchTab(this, \'' + mapaId +
+          '\')">🌍 Mapa</button>';
+        html += '</div>';
+
+        // Síntese
+        html += '<div class="tab-content active" id="' + sinteseId + '">';
+        dados.sintese.forEach(function(s) {
+          html += '<div class="geo-sintese"><h4>' + s.titulo + '</h4><p>' + s.conteudo + '</p></div>';
+        });
+        html += '</div>';
+
+        // Exercícios
+        html += '<div class="tab-content" id="' + exerciciosId + '">';
+        dados.exercicios.forEach(function(ex, i) {
+          html += '<div class="geo-exercicio" data-exercicio="' + (i + 1) + '">';
+          html += '<div class="pergunta">' + (i + 1) + '. ' + ex.pergunta + '</div>';
+          html += '<div class="opcoes">';
+          ex.opcoes.forEach(function(op, j) {
+            html += '<label><input type="radio" name="geo' + num + '-ex' + (i + 1) + '" value="' + String
+              .fromCharCode(65 + j) + '"> ' + op + '</label>';
+          });
+          html += '</div>';
+          html += '<button class="btn-verificar" onclick="verificarGeo(this, \'' + ex.correta +
+            '\')">Verificar</button>';
+          html += '<div class="resposta-feedback"></div>';
+          html += '</div>';
+        });
+        html += '</div>';
+
+        // Soluções
+        html += '<div class="tab-content" id="' + solucoesId + '">';
+        dados.solucoes.forEach(function(s, i) {
+          html += '<div class="geo-solucao"><div class="solucao-titulo">📌 Exercício ' + (i + 1) +
+            '</div><div class="solucao-texto">Resposta: <strong>' + s + '</strong></div></div>';
+        });
+        html += '</div>';
+
+        // Quiz
+        html += '<div class="tab-content" id="' + quizId + '">';
+        html += '<div id="geo-quiz-container">';
+        html += '<p style="color:var(--geo-muted);margin-bottom:1rem;">Testa os teus conhecimentos sobre ' + titulo +
+          '!</p>';
+        html += '<div id="geo-quiz-pergunta" style="background:var(--geo-card);border:1px solid var(--geo-border);border-radius:8px;padding:1.2rem;margin-bottom:1rem;min-height:80px;">';
+        html += '<span style="color:var(--geo-green);font-weight:700;">Clique em "Iniciar Quiz" para começar.</span>';
+        html += '</div>';
+        html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">';
+        html += '<button class="btn-quiz-iniciar" onclick="iniciarGeoQuiz()">▶ Iniciar Quiz</button>';
+        html += '<button class="btn-quiz-cancelar" onclick="cancelarGeoQuiz()" id="geo-btn-cancelar">✕ Cancelar</button>';
+        html += '</div>';
+        html += '<div id="geo-quiz-resultado" style="margin-top:1rem;"></div>';
+        html += '<div id="geo-quiz-hud" style="display:flex;gap:1rem;margin-top:0.5rem;font-size:0.85rem;color:var(--geo-muted);">';
+        html += '<span>Pontos: <strong id="geo-quiz-score" style="color:var(--geo-green);">0</strong></span>';
+        html += '<span>Total: <strong id="geo-quiz-total" style="color:var(--geo-green);">0</strong></span>';
+        html += '</div></div></div>';
+
+        // Flashcards
+        html += '<div class="tab-content" id="' + flashcardsId + '">';
+        html += '<div id="geo-flashcard-container">';
+        html += '<div class="geo-flashcard" onclick="virarFlashcardGeo()">';
+        html += '<div class="card-inner" id="geo-flashcard-inner">';
+        html += '<div class="card-front" id="geo-flashcard-front">Carregando...</div>';
+        html += '<div class="card-back" id="geo-flashcard-back">Carregando...</div>';
+        html += '</div></div>';
+        html += '<div class="flashcard-counter" id="geo-flashcard-counter">1 / ' + geoFlashcards.length + '</div>';
+        html += '<div class="flashcard-nav">';
+        html += '<button onclick="flashcardGeoAnterior()">◀ Anterior</button>';
+        html += '<button onclick="flashcardGeoProximo()">Próximo ▶</button>';
+        html += '</div></div>';
+        html += '</div>';
+
+        // Timeline
+        html += '<div class="tab-content" id="' + timelineId + '">';
+        html += '<div class="geo-timeline">';
+        dados.timeline.forEach(function(t) {
+          html += '<div class="evento"><span class="ano">' + t.ano + '</span><span class="desc">' + t.desc +
+            '</span></div>';
+        });
+        html += '</div></div>';
+
+        // Mapa
+        html += '<div class="tab-content" id="' + mapaId + '">';
+        html += '<div class="geo-mapa-container">';
+        html += '<i class="fas fa-globe-' + (num == 1 ? 'americas' : num == 2 || num == 3 ? 'africa' : 'asia') +
+          '"></i>';
+        html += '<p style="color:var(--geo-cream);font-weight:700;">🌍 ' + titulo + '</p>';
+        html += '<div class="info-box">';
+        html +=
+          '<p><strong>📍 Dados gerais:</strong> Conteúdo detalhado disponível na aba <strong>Síntese</strong>.</p>';
+        html += '</div>';
+        html += '</div></div>';
+
+        html += '</div>';
+        return html;
+      }
+
+      // PESQUISA
+      const searchIndex = [];
+
+      function buildSearchIndex() {
+        var modules = [
+          { id: 'unidade1', titulo: 'População', desc: 'Distribuição, crescimento, migrações, teorias demográficas' },
+          { id: 'unidade2', titulo: 'Agricultura e Pecuária', desc: 'Evolução, espaço agrário, sistemas agrários' },
+          { id: 'unidade3', titulo: 'Indústria e Comércio', desc: 'Revolução Industrial, tipos de indústria' },
+          { id: 'unidade4', titulo: 'Turismo', desc: 'Conceito, tipos, importância, património' },
+          { id: 'unidade5', titulo: 'Transportes e Comunicações', desc: 'Evolução, tipos de transporte' },
+          { id: 'unidade6', titulo: 'Urbanismo', desc: 'Conceito de cidade, evolução, problemas urbanos' }
+        ];
+
+        var sinteses = [
+          'Distribuição da população, áreas de grande concentração, vazios humanos',
+          'Crescimento populacional, natalidade, fecundidade, mortalidade',
+          'Migrações, temporárias, definitivas, internas, externas',
+          'Teorias demográficas, Malthusiana, Anti malthusiana',
+          'Estrutura da população, pirâmides etárias, sectores de actividade',
+          'Problemas demográficos, desigualdades, desemprego',
+          'Evolução da agricultura, Revolução Neolítica, sedentarização',
+          'Espaço agrário, factores naturais e humanos',
+          'Sistemas agrários, tradicional, moderna, sequeiro, irrigada',
+          'Pecuária, extensiva, intensiva, regiões produtoras',
+          'Problemas ambientais, degradação dos solos, queimadas',
+          'Evolução da indústria, artesanal, manufactureira, Revolução Industrial',
+          'Fases da Revolução Industrial, máquina a vapor, petróleo, automação',
+          'Tipos de indústria, bens de equipamento, bens de consumo, indústrias de ponta',
+          'Comércio internacional, desigualdades, fluxos comerciais',
+          'Conceito de turismo, tipos, cultural, desportivo, religioso, ambiental',
+          'Importância do turismo, rendimentos, divisas, receitas fiscais',
+          'Património turístico mundial, natural, cultural, bacias turísticas',
+          'Impactos ambientais do turismo, positivos, negativos',
+          'Evolução dos transportes, máquina a vapor, diesel, automóvel, avião',
+          'Tipos de transporte, rodoviário, ferroviário, marítimo, aéreo',
+          'Comunicações, evolução, rádio, televisão, internet',
+          'Impacto ambiental dos transportes, poluição atmosférica',
+          'Conceito de cidade, características, concentração de habitat',
+          'Evolução das cidades, Jericó, Idade Média, Revolução Industrial',
+          'Funções da cidade, político-administrativa, industrial, comercial, cultural, religiosa',
+          'Relações cidade-campo, interdependência',
+          'Problemas urbanos, trânsito, abastecimento, poluição, saturação demográfica'
+        ];
+
+        searchIndex.length = 0;
+        modules.forEach(function(m) {
+          searchIndex.push({ ...m, tipo: 'modulo' });
+        });
+        sinteses.forEach(function(texto, i) {
+          var moduloId = 'unidade1';
+          if (i >= 6 && i < 11) moduloId = 'unidade2';
+          else if (i >= 11 && i < 15) moduloId = 'unidade3';
+          else if (i >= 15 && i < 19) moduloId = 'unidade4';
+          else if (i >= 19 && i < 23) moduloId = 'unidade5';
+          else if (i >= 23) moduloId = 'unidade6';
+          var modulo = modules.find(function(m) { return m.id === moduloId; });
+          searchIndex.push({
+            id: moduloId,
+            titulo: modulo ? modulo.titulo : 'Unidade',
+            desc: texto,
+            tipo: 'sintese',
+            texto: texto
+          });
+        });
+      }
+
+      window.buscarConteudo = function(event) {
+        var input = document.getElementById('searchInput');
+        var results = document.getElementById('searchResults');
+        var query = input.value.toLowerCase().trim();
+
+        if (event && event.key === 'Enter') {
+          event.preventDefault();
+        }
+
+        if (query.length < 2) {
+          results.classList.remove('active');
+          return;
+        }
+
+        buildSearchIndex();
+
+        var resultados = searchIndex.filter(function(item) {
+          return item.titulo.toLowerCase().includes(query) ||
+            item.desc.toLowerCase().includes(query);
+        });
+
+        if (resultados.length === 0) {
+          results.innerHTML = '<div class="no-results">Nenhum resultado encontrado para "' + query + '"</div>';
+          results.classList.add('active');
+          return;
+        }
+
+        results.innerHTML = resultados.slice(0, 10).map(function(item) {
+          return '<div class="result-item" onclick="abrirModulo(\'' + item.id + '\')">' +
+            '<div class="titulo">' + (item.tipo === 'modulo' ? '📚' : '📖') + ' ' + item.titulo + '</div>' +
+            '<div class="desc">' + item.desc.substring(0, 100) + (item.desc.length > 100 ? '...' : '') + '</div>' +
+            '</div>';
+        }).join('');
+
+        results.classList.add('active');
+      };
+
+      // Inicializar
+      document.getElementById('modulo-lista').style.display = 'block';
+      document.getElementById('modulo-pagina').classList.remove('active');
+
+      // Carregar flashcards
+      geoFlashcards = geoFlashcardsData;
+      setTimeout(function() {
+        if (document.getElementById('geo-flashcard-front')) {
+          carregarFlashcardGeo(0);
+        }
+      }, 200);
+
+      console.log('🌍 GEO-X carregado com sucesso!');
+    });
+    // ─── MASCOTE GEOBOT ──────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+  const mascote = document.getElementById('mascote');
+  if (!mascote) return;
+
+  const pupilLeft = document.getElementById('pupil-left');
+  const pupilRight = document.getElementById('pupil-right');
+  
+  let targetX = window.innerWidth / 2;
+  let targetY = window.innerHeight / 2;
+  let isHappy = false;
+  
+  function updateMascote() {
+    const dx = (targetX - window.innerWidth / 2) * 0.03;
+    const dy = (targetY - window.innerHeight / 2) * 0.03;
+    
+    if (pupilLeft && pupilRight) {
+      pupilLeft.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
+      pupilRight.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
+    }
+    requestAnimationFrame(updateMascote);
+  }
+  
+  document.addEventListener('mousemove', function(e) {
+    targetX = e.clientX;
+    targetY = e.clientY;
+  });
+  
+  document.addEventListener('touchmove', function(e) {
+    var touch = e.touches[0];
+    if (touch) {
+      targetX = touch.clientX;
+      targetY = touch.clientY;
+    }
+  }, { passive: true });
+  
+  document.addEventListener('click', function() {
+    if (!isHappy) {
+      mascote.classList.add('happy');
+      isHappy = true;
+      mascote.style.transform = 'scale(1.2)';
+      setTimeout(function() {
+        mascote.style.transform = 'scale(1)';
+        setTimeout(function() {
+          mascote.classList.remove('happy');
+          isHappy = false;
+        }, 600);
+      }, 150);
+    }
+  });
+  
+  document.addEventListener('touchstart', function() {
+    if (!isHappy) {
+      mascote.classList.add('happy');
+      isHappy = true;
+      mascote.style.transform = 'scale(1.2)';
+      setTimeout(function() {
+        mascote.style.transform = 'scale(1)';
+        setTimeout(function() {
+          mascote.classList.remove('happy');
+          isHappy = false;
+        }, 600);
+      }, 150);
+    }
+  }, { passive: true });
+  
+  updateMascote();
+});
+  </script>
+  <!-- ═══════════════════════════════════════
+     MASCOTE GEOBOT
+═══════════════════════════════════════ -->
+<div class="mascote-container" id="mascote">
+  <div class="mascote-body">
+    <div class="mascote-antena mascote-antena-left"></div>
+    <div class="mascote-antena mascote-antena-right"></div>
+    <div class="mascote-glow"></div>
+    <div class="mascote-eyes">
+      <div class="mascote-eye"><div class="mascote-pupil" id="pupil-left"></div></div>
+      <div class="mascote-eye"><div class="mascote-pupil" id="pupil-right"></div></div>
+    </div>
+    <div class="mascote-mouth"></div>
+    <div class="mascote-label">GEOBOT</div>
+  </div>
+</div>
+</body>
+</html>
