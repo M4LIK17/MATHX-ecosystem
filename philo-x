@@ -1,0 +1,2254 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PHILO-X — Filosofia Interativa</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════
+       PHILO-X — ESTILOS COMPLETOS
+       Paleta: Roxo (#9b6bff) + Dourado (#ffd700)
+    ═══════════════════════════════════════════ */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0d0a14;
+      color: #f0ecf5;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    :root {
+      --philo-bg: #0d0a14;
+      --philo-card: #191528;
+      --philo-border: #3d2a5c;
+      --philo-purple: #9b6bff;
+      --philo-gold: #ffd700;
+      --philo-cream: #f0ecf5;
+      --philo-muted: #8a7a9a;
+      --philo-error: #ff6b6b;
+      --philo-shadow: rgba(155, 107, 255, 0.15);
+    }
+
+    body.light-mode {
+      --philo-bg: #f0ecf5;
+      --philo-card: #ffffff;
+      --philo-border: #c8b8d8;
+      --philo-cream: #1a142a;
+      --philo-muted: #7a6a8a;
+      --philo-shadow: rgba(155, 107, 255, 0.1);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      background: var(--philo-bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--philo-border);
+      border-radius: 999px;
+    }
+
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem 4rem;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .philo-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0 1.5rem;
+      border-bottom: 2px solid var(--philo-border);
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .philo-header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .philo-header-left i {
+      font-size: 2.2rem;
+      color: var(--philo-gold);
+    }
+
+    .philo-header-left h1 {
+      font-size: 1.8rem;
+      color: var(--philo-purple);
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .philo-header-left h1 span {
+      color: var(--philo-gold);
+    }
+
+    .philo-header .badge {
+      background: var(--philo-border);
+      color: var(--philo-gold);
+      padding: 0.2rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .header-actions button {
+      background: none;
+      border: none;
+      color: var(--philo-cream);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .header-actions button:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--philo-border);
+    }
+
+    /* SEARCH */
+    .search-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      max-width: 500px;
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--philo-border);
+      background: var(--philo-card);
+      color: var(--philo-cream);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .search-bar input:focus {
+      border-color: var(--philo-purple);
+    }
+
+    .search-bar input::placeholder {
+      color: var(--philo-muted);
+    }
+
+    .search-bar button {
+      padding: 0.6rem 1.2rem;
+      background: var(--philo-purple);
+      border: none;
+      border-radius: 8px;
+      color: #0d0a14;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .search-bar button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px var(--philo-shadow);
+    }
+
+    .search-results {
+      display: none;
+      background: var(--philo-card);
+      border: 1px solid var(--philo-border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .search-results.active {
+      display: block;
+    }
+
+    .search-results .result-item {
+      padding: 0.5rem;
+      border-bottom: 1px solid var(--philo-border);
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .search-results .result-item:hover {
+      background: rgba(155, 107, 255, 0.08);
+    }
+
+    .search-results .result-item .titulo {
+      color: var(--philo-purple);
+      font-weight: 600;
+    }
+
+    .search-results .result-item .desc {
+      color: var(--philo-muted);
+      font-size: 0.8rem;
+    }
+
+    .search-results .no-results {
+      color: var(--philo-muted);
+      text-align: center;
+      padding: 1rem;
+    }
+
+    /* MENU CIRCULAR */
+    .btn-menu-toggle {
+      background: none;
+      border: none;
+      color: var(--philo-purple);
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0.3rem 0.6rem;
+      border-radius: 8px;
+      border: 1px solid transparent;
+    }
+
+    .btn-menu-toggle:hover {
+      border-color: var(--philo-border);
+      background: rgba(155, 107, 255, 0.06);
+      transform: scale(1.05);
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .philo-menu-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      z-index: 1000;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .philo-menu-container.active {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .philo-menu {
+      position: relative;
+      width: 320px;
+      height: 320px;
+    }
+
+    .knob {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle at 30% 30%, #2a1a4a, #0d0a14);
+      border-radius: 50%;
+      border: 2px solid var(--philo-gold);
+      box-shadow: 0 0 40px rgba(155, 107, 255, 0.15);
+      cursor: pointer;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      color: var(--philo-gold);
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      user-select: none;
+    }
+
+    .knob:hover {
+      transform: translate(-50%, -50%) scale(1.06);
+      box-shadow: 0 0 60px rgba(155, 107, 255, 0.25);
+    }
+
+    .knob i {
+      transition: transform 0.6s ease;
+    }
+
+    .philo-menu.active .knob i {
+      transform: rotate(360deg);
+    }
+
+    .knob .label {
+      position: absolute;
+      bottom: -30px;
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--philo-gold);
+      opacity: 0.5;
+      white-space: nowrap;
+    }
+
+    .philo-menu ul {
+      list-style: none;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .philo-menu li {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 60px;
+      height: 60px;
+      margin: -30px;
+      transform: rotate(calc(var(--i) * 72deg)) translate(125px) rotate(calc(var(--i) * -72deg));
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .philo-menu.active li {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .philo-menu li:nth-child(1) { --i: 0; }
+    .philo-menu li:nth-child(2) { --i: 1; }
+    .philo-menu li:nth-child(3) { --i: 2; }
+    .philo-menu li:nth-child(4) { --i: 3; }
+    .philo-menu li:nth-child(5) { --i: 4; }
+
+    .philo-menu li button {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 1.5px solid var(--philo-border);
+      background: radial-gradient(circle at 30% 30%, #1a142a, #0d0a14);
+      color: var(--philo-cream);
+      cursor: pointer;
+      font-size: 20px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .philo-menu li button:hover {
+      transform: scale(1.15);
+      border-color: var(--philo-gold);
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.15);
+      background: radial-gradient(circle at 30% 30%, #2a1a4a, #0d0a14);
+    }
+
+    .philo-menu li button::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: -28px;
+      font-size: 0.55rem;
+      letter-spacing: 0.5px;
+      color: var(--philo-muted);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      font-weight: 600;
+    }
+
+    .philo-menu li button:hover::after {
+      opacity: 1;
+    }
+
+    .menu-close-btn {
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      background: rgba(255, 68, 68, 0.12);
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      color: #ff6b6b;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+    }
+
+    .menu-close-btn:hover {
+      background: rgba(255, 68, 68, 0.25);
+      transform: scale(1.1);
+    }
+
+    /* MODULES */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .modules-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .modules-grid {
+        grid-template-columns: 1fr;
+      }
+      .app-container {
+        padding: 1rem;
+      }
+      .philo-menu {
+        width: 260px;
+        height: 260px;
+      }
+      .philo-menu li {
+        width: 48px;
+        height: 48px;
+        margin: -24px;
+        transform: rotate(calc(var(--i) * 72deg)) translate(100px) rotate(calc(var(--i) * -72deg));
+      }
+      .philo-menu li button {
+        font-size: 16px;
+      }
+      .knob {
+        width: 64px;
+        height: 64px;
+        font-size: 22px;
+      }
+      .menu-close-btn {
+        top: -12px;
+        right: -12px;
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+      }
+      .search-bar {
+        max-width: 100%;
+      }
+    }
+
+    .module-card {
+      background: var(--philo-card);
+      border: 1px solid var(--philo-border);
+      border-radius: 14px;
+      padding: 1.6rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .module-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--philo-gold);
+      box-shadow: 0 8px 40px var(--philo-shadow);
+    }
+
+    .module-card .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .module-card .card-header i {
+      font-size: 1.6rem;
+      color: var(--philo-gold);
+    }
+
+    .module-card .card-header h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--philo-cream);
+      flex: 1;
+    }
+
+    .module-card .card-desc {
+      font-size: 0.82rem;
+      color: var(--philo-muted);
+      line-height: 1.5;
+    }
+
+    .badge-new-tag {
+      background: rgba(255, 215, 0, 0.15);
+      border: 1px solid var(--philo-gold);
+      color: var(--philo-gold);
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    /* MODULE PAGE */
+    .modulo-pagina {
+      display: none;
+      animation: fadeIn 0.4s ease both;
+    }
+
+    .modulo-pagina.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .btn-voltar {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--philo-border);
+      color: var(--philo-muted);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-voltar:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--philo-cream);
+      transform: translateX(-3px);
+    }
+
+    .modulo-container {
+      background: var(--philo-card);
+      border: 1px solid var(--philo-border);
+      border-radius: 14px;
+      padding: 1.6rem;
+    }
+
+    .modulo-container .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .modulo-container .card-header i {
+      font-size: 1.8rem;
+      color: var(--philo-gold);
+    }
+
+    .modulo-container .card-header h2 {
+      font-size: 1.2rem;
+      color: var(--philo-purple);
+    }
+
+    /* TABS */
+    .inner-tabs {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 0.35rem 0.8rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--philo-border);
+      border-radius: 999px;
+      color: var(--philo-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active,
+    .tab-btn:hover {
+      background: var(--philo-purple);
+      border-color: var(--philo-purple);
+      color: #0d0a14;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.25s ease both;
+    }
+
+    /* APONTAMENTOS */
+    .philo-apontamento {
+      background: rgba(155, 107, 255, 0.06);
+      border-left: 4px solid var(--philo-purple);
+      padding: 1.2rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 1.2rem;
+    }
+
+    .philo-apontamento h4 {
+      color: var(--philo-gold);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .philo-apontamento p,
+    .philo-apontamento li {
+      color: var(--philo-cream);
+      font-size: 0.85rem;
+      line-height: 1.7;
+    }
+
+    .philo-apontamento ul {
+      padding-left: 1.5rem;
+    }
+
+    .philo-apontamento .destaque {
+      color: var(--philo-gold);
+      font-weight: 600;
+    }
+
+    .tabela-comparativa {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.5rem 0;
+      font-size: 0.82rem;
+    }
+
+    .tabela-comparativa th,
+    .tabela-comparativa td {
+      border: 1px solid var(--philo-border);
+      padding: 0.5rem 0.8rem;
+      text-align: left;
+    }
+
+    .tabela-comparativa th {
+      background: rgba(155, 107, 255, 0.15);
+      color: var(--philo-gold);
+      font-weight: 700;
+    }
+
+    .tabela-comparativa td {
+      color: var(--philo-cream);
+    }
+
+    /* EXERCÍCIOS */
+    .philo-exercicio {
+      background: rgba(155, 107, 255, 0.04);
+      border: 1px solid var(--philo-border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .philo-exercicio .pergunta {
+      color: var(--philo-gold);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .philo-exercicio .opcoes {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .philo-exercicio .opcoes label {
+      color: var(--philo-cream);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .philo-exercicio .opcoes input[type="radio"] {
+      accent-color: var(--philo-purple);
+      margin-right: 0.5rem;
+    }
+
+    .btn-verificar {
+      margin-top: 0.7rem;
+      padding: 0.4rem 1rem;
+      background: var(--philo-purple);
+      border: none;
+      border-radius: 8px;
+      color: #0d0a14;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-verificar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px var(--philo-shadow);
+    }
+
+    .resposta-feedback {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .resposta-feedback.correto {
+      color: var(--philo-gold);
+    }
+    .resposta-feedback.errado {
+      color: var(--philo-error);
+    }
+
+    /* SOLUÇÕES */
+    .philo-solucao {
+      background: rgba(155, 107, 255, 0.05);
+      border: 1px dashed var(--philo-border);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .philo-solucao .solucao-titulo {
+      color: var(--philo-gold);
+      font-weight: 700;
+      font-size: 0.8rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .philo-solucao .solucao-texto {
+      color: var(--philo-cream);
+      font-size: 0.82rem;
+    }
+
+    /* FLASHCARDS */
+    .philo-flashcard {
+      perspective: 800px;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      cursor: pointer;
+    }
+
+    .philo-flashcard .card-inner {
+      position: relative;
+      width: 100%;
+      min-height: 160px;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+
+    .philo-flashcard .card-inner.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .philo-flashcard .card-front,
+    .philo-flashcard .card-back {
+      position: absolute;
+      width: 100%;
+      min-height: 160px;
+      backface-visibility: hidden;
+      border-radius: 8px;
+      padding: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .philo-flashcard .card-front {
+      background: var(--philo-card);
+      border: 1px solid var(--philo-border);
+      color: var(--philo-cream);
+    }
+
+    .philo-flashcard .card-back {
+      background: var(--philo-purple);
+      color: #0d0a14;
+      transform: rotateY(180deg);
+      font-weight: 600;
+    }
+
+    .flashcard-counter {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--philo-muted);
+      margin-top: 0.8rem;
+    }
+
+    .flashcard-nav {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    .flashcard-nav button {
+      padding: 0.3rem 0.8rem;
+      background: rgba(155, 107, 255, 0.15);
+      border: 1px solid var(--philo-border);
+      border-radius: 8px;
+      color: var(--philo-cream);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .flashcard-nav button:hover {
+      background: rgba(155, 107, 255, 0.3);
+      border-color: var(--philo-purple);
+    }
+
+    /* TIMELINE */
+    .philo-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      padding: 0.5rem 0;
+    }
+
+    .philo-timeline .evento {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 0.8rem;
+      background: rgba(155, 107, 255, 0.04);
+      border-radius: 8px;
+      border-left: 3px solid var(--philo-gold);
+    }
+
+    .philo-timeline .evento .ano {
+      font-weight: 800;
+      color: var(--philo-gold);
+      min-width: 80px;
+      font-size: 0.9rem;
+    }
+
+    .philo-timeline .evento .desc {
+      color: var(--philo-cream);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* MAPA CONCEPTUAL */
+    .mapa-conceptual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      background: rgba(155, 107, 255, 0.03);
+      border-radius: 12px;
+      border: 1px solid var(--philo-border);
+    }
+
+    .mapa-nodo {
+      background: var(--philo-card);
+      border: 2px solid var(--philo-purple);
+      border-radius: 12px;
+      padding: 0.8rem 1.5rem;
+      margin: 0.3rem 0;
+      color: var(--philo-cream);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-align: center;
+      min-width: 120px;
+      transition: all 0.3s ease;
+    }
+
+    .mapa-nodo:hover {
+      border-color: var(--philo-gold);
+      transform: scale(1.02);
+    }
+
+    .mapa-nodo.central {
+      border-color: var(--philo-gold);
+      background: rgba(255, 215, 0, 0.08);
+      font-size: 1.1rem;
+      padding: 1rem 2rem;
+    }
+
+    .mapa-nodo.sub {
+      border-color: var(--philo-border);
+      font-weight: 400;
+      font-size: 0.8rem;
+      padding: 0.5rem 1rem;
+    }
+
+    .mapa-conexao {
+      color: var(--philo-muted);
+      font-size: 1.2rem;
+      padding: 0.1rem 0;
+    }
+
+    .mapa-linha {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin: 0.3rem 0;
+    }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding: 2rem 1rem 0.5rem;
+      border-top: 1px solid var(--philo-border);
+      color: var(--philo-muted);
+      font-size: 0.8rem;
+      margin-top: 2rem;
+    }
+
+    .powered {
+      color: var(--philo-gold);
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    /* BOOT SCREEN */
+    #boot-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0d0a14;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999 !important;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    #boot-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #particles-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .boot-container {
+      text-align: center;
+      padding: 2rem;
+      z-index: 2;
+      position: relative;
+    }
+
+    .boot-logo {
+      font-size: 4rem;
+      font-weight: 900;
+      letter-spacing: 6px;
+      margin-bottom: 2.5rem;
+      animation: bootPulse 1.2s ease-in-out infinite;
+    }
+
+    .boot-logo .logo-philo {
+      color: #9b6bff;
+    }
+
+    .boot-logo .logo-x {
+      color: #ffd700;
+    }
+
+    @keyframes bootPulse {
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.7;
+        transform: scale(0.98);
+      }
+    }
+
+    .boot-loader {
+      width: 240px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      margin: 0 auto 1.5rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .boot-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #9b6bff, #ffd700);
+      border-radius: 4px;
+      animation: bootProgress 2.5s ease-in-out forwards;
+    }
+
+    @keyframes bootProgress {
+      0% {
+        width: 0%;
+      }
+      20% {
+        width: 25%;
+      }
+      40% {
+        width: 45%;
+      }
+      60% {
+        width: 65%;
+      }
+      80% {
+        width: 85%;
+      }
+      100% {
+        width: 100%;
+      }
+    }
+
+    .boot-status {
+      font-size: 0.85rem;
+      color: #9b6bff;
+      font-weight: 300;
+      letter-spacing: 2px;
+      margin-bottom: 2.5rem;
+      min-height: 1.5rem;
+      font-family: 'Courier New', monospace;
+    }
+
+    .boot-powered {
+      position: fixed !important;
+      bottom: 30px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 0.55rem;
+      color: rgba(255, 255, 255, 0.08);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-weight: 300;
+      z-index: 2;
+      transition: color 0.5s ease;
+    }
+
+    .boot-powered:hover {
+      color: rgba(255, 255, 255, 0.15);
+    }
+
+    @media (max-width: 600px) {
+      .boot-logo {
+        font-size: 3rem;
+      }
+      .boot-loader {
+        width: 180px;
+      }
+    }
+    /* ─── MASCOTE PHILOBOT — com óculos 🤓 ─── */
+.mascote-container {
+  position: fixed; bottom: 30px; left: 30px; z-index: 9999;
+  pointer-events: none; width: 100px; height: 100px;
+}
+.mascote-body {
+  width: 90px; height: 90px;
+  background: linear-gradient(145deg, #2a1a4a, #0d0a14);
+  border-radius: 50%; border: 3px solid #9b6bff;
+  box-shadow: 0 8px 25px rgba(155, 107, 255, 0.4);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; animation: floatMascote 3s ease-in-out infinite;
+}
+.mascote-body::before, .mascote-body::after {
+  content: ''; position: absolute; top: -20px;
+  width: 3px; height: 20px; background: #9b6bff; border-radius: 2px;
+}
+.mascote-body::before { left: 25px; } .mascote-body::after { right: 25px; }
+.mascote-antena {
+  position: absolute; top: -25px; width: 10px; height: 10px;
+  background: #ffd700; border-radius: 50%;
+  box-shadow: 0 0 15px #ffd700;
+  animation: piscaAntena 1.5s ease-in-out infinite;
+}
+.mascote-antena-left { left: 21px; } .mascote-antena-right { right: 21px; }
+
+/* ─── ÓCULOS ─── */
+.mascote-oculos {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 5;
+  width: 70px;
+  height: 32px;
+}
+.oculos-lente {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid #ffd700;
+  background: rgba(255, 215, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.15), inset 0 0 15px rgba(255, 215, 0, 0.05);
+}
+.oculos-lente-left { transform: rotate(-5deg); }
+.oculos-lente-right { transform: rotate(5deg); }
+.oculos-ponte {
+  width: 8px;
+  height: 3px;
+  background: #ffd700;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.oculos-haste {
+  position: absolute;
+  width: 16px;
+  height: 3px;
+  background: #ffd700;
+  top: 12px;
+}
+.oculos-haste-left {
+  right: 100%;
+  margin-right: 2px;
+  transform: rotate(-12deg);
+  transform-origin: right center;
+}
+.oculos-haste-right {
+  left: 100%;
+  margin-left: 2px;
+  transform: rotate(12deg);
+  transform-origin: left center;
+}
+
+/* ─── OLHOS DENTRO DAS LENTES ─── */
+.mascote-eye {
+  width: 14px;
+  height: 14px;
+  background: #0d0a14;
+  border-radius: 50%;
+  border: 2px solid #ffd700;
+  position: relative;
+  overflow: hidden;
+}
+.mascote-pupil {
+  width: 6px;
+  height: 6px;
+  background: #ffd700;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.05s linear;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+}
+.oculos-lente .mascote-eye {
+  border: none;
+  width: 18px;
+  height: 18px;
+}
+.oculos-lente .mascote-pupil {
+  width: 7px;
+  height: 7px;
+}
+
+/* ─── BOCA ─── */
+.mascote-mouth {
+  width: 18px;
+  height: 8px;
+  border-bottom: 3px solid #9b6bff;
+  border-radius: 0 0 20px 20px;
+  margin-top: 6px;
+  transition: all 0.3s ease;
+}
+.mascote-container.happy .mascote-mouth {
+  width: 22px;
+  height: 12px;
+  border-bottom: 4px solid #ffd700;
+  border-radius: 0 0 30px 30px;
+}
+.mascote-container.happy .oculos-lente {
+  border-color: #ffd700;
+  background: rgba(255, 215, 0, 0.15);
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.25);
+}
+
+/* ─── LABEL ─── */
+.mascote-label {
+  position: absolute;
+  bottom: -30px;
+  background: rgba(0,0,0,0.7);
+  color: #9b6bff;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid #3d2a5c;
+  white-space: nowrap;
+}
+.mascote-glow {
+  position: absolute;
+  top: -5px;
+  width: 15px;
+  height: 15px;
+  background: radial-gradient(circle, rgba(155, 107, 255, 0.3), transparent);
+  border-radius: 50%;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* ─── ANIMAÇÕES ─── */
+@keyframes floatMascote {
+  0%,100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes piscaAntena {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.7); }
+}
+@keyframes glowPulse {
+  0%,100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+@media (max-width: 600px) {
+  .mascote-container { width: 80px; height: 80px; bottom: 15px; left: 15px; }
+  .mascote-body { width: 70px; height: 70px; }
+  .mascote-oculos { top: 22px; width: 55px; height: 26px; }
+  .oculos-lente { width: 22px; height: 22px; }
+  .oculos-lente .mascote-eye { width: 14px; height: 14px; }
+  .oculos-lente .mascote-pupil { width: 5px; height: 5px; }
+  .oculos-haste { width: 12px; height: 2px; top: 10px; }
+  .mascote-label { font-size: 9px; bottom: -25px; }
+},
+  </style>
+</head>
+<body>
+
+  <!-- BOOT SCREEN -->
+  <div id="boot-screen">
+    <canvas id="particles-canvas"></canvas>
+    <div class="boot-container">
+      <div class="boot-logo">
+        <span class="logo-philo">PHILO</span><span class="logo-x">-X</span>
+      </div>
+      <div class="boot-loader"><div class="boot-bar"></div></div>
+      <div class="boot-status" id="boot-status">Inicializando...</div>
+      <div class="boot-powered">POWERED BY M4L!K</div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      console.log('🧠 Boot PHILO-X iniciado');
+      var bootScreen = document.getElementById('boot-screen');
+      var statusEl = document.getElementById('boot-status');
+      if (!bootScreen || !statusEl) {
+        console.error('❌ Elementos do boot não encontrados');
+        return;
+      }
+
+      var canvas = document.getElementById('particles-canvas');
+      var ctx = canvas.getContext('2d');
+      var width, height;
+
+      var symbols = ['🧠', '💭', '📜', '⚖️', '🏛️', '🌍', '🗺️', '🔍', '💡', '✨', '🌟', '📚', '✍️', '🕊️', '🔮', '🌿', '🫂', '🤝', '🗣️',
+        '📖', '🧘', '🌱', '🪷', '☯️', '🕯️', '📿', '🧿', '⚛️', '🧬', '🔭', '🧪', '📐'
+      ];
+
+      function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      var particles = [];
+      var NUM_PARTICLES = 160;
+
+      function randomColor() {
+        var colors = ['#9b6bff', '#ffd700', '#f0ecf5', '#8a7a9a', '#7c3aed', '#c084fc', '#fbbf24'];
+        return colors[Math.floor(Math.random() * colors.length)];
+      }
+
+      function createParticle() {
+        return {
+          x: Math.random() * width,
+          y: Math.random() * height,
+          size: 18 + Math.random() * 20,
+          speedX: (Math.random() - 0.5) * 0.3,
+          speedY: (Math.random() - 0.5) * 0.3,
+          symbol: symbols[Math.floor(Math.random() * symbols.length)],
+          color: randomColor(),
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.02,
+          opacity: 0.04 + Math.random() * 0.04,
+          life: 0,
+          maxLife: 250 + Math.random() * 350
+        };
+      }
+      for (var i = 0; i < NUM_PARTICLES; i++) particles.push(createParticle());
+
+      function animateParticles() {
+        ctx.clearRect(0, 0, width, height);
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i];
+          p.x += p.speedX;
+          p.y += p.speedY;
+          p.rotation += p.rotationSpeed;
+          p.life++;
+          if (p.x < -50 || p.x > width + 50 || p.y < -50 || p.y > height + 50 || p.life > p.maxLife) {
+            particles[i] = createParticle();
+            particles[i].life = 0;
+          }
+          p.speedX += (Math.random() - 0.5) * 0.01;
+          p.speedY += (Math.random() - 0.5) * 0.01;
+          p.speedX = Math.max(-0.8, Math.min(0.8, p.speedX));
+          p.speedY = Math.max(-0.8, Math.min(0.8, p.speedY));
+          var alpha = p.opacity * (1 - p.life / p.maxLife);
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0.01, alpha);
+          ctx.font = p.size + 'px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(p.symbol, 0, 0);
+          ctx.restore();
+        }
+        requestAnimationFrame(animateParticles);
+      }
+      animateParticles();
+
+      var bootMessages = ['Inicializando...', 'Carregando módulos...', 'Configurando interface...',
+        'Conectando ao servidor...', 'PHILO-X pronto!', 'Powered by M4L!K 🚀'
+      ];
+      var index = 0;
+      var messageInterval = setInterval(function() {
+        index++;
+        if (index < bootMessages.length) {
+          statusEl.textContent = bootMessages[index];
+        } else {
+          clearInterval(messageInterval);
+        }
+      }, 400);
+
+      setTimeout(function() {
+        bootScreen.classList.add('hidden');
+        setTimeout(function() {
+          bootScreen.style.display = 'none';
+        }, 800);
+      }, 4500);
+      setTimeout(function() {
+        if (!bootScreen.classList.contains('hidden')) {
+          bootScreen.classList.add('hidden');
+          setTimeout(function() {
+            bootScreen.style.display = 'none';
+          }, 800);
+        }
+      }, 7000);
+      console.log('✅ Boot PHILO-X carregado com sucesso');
+    })();
+  </script>
+
+  <!-- MENU OVERLAY -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+
+  <!-- MENU CIRCULAR -->
+  <div class="philo-menu-container" id="menuContainer">
+    <div class="philo-menu" id="philoMenu">
+      <button class="menu-close-btn" id="menuCloseBtn" aria-label="Fechar menu">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <div class="knob" id="menuKnob">
+        <i class="fas fa-brain"></i>
+        <span class="label">PHILO-X</span>
+      </div>
+
+      <ul>
+        <li><button data-tooltip="Filosofia e Ciência" onclick="abrirModulo('unidade1')"><i class="fas fa-flask"></i></button></li>
+        <li><button data-tooltip="Filosofia Política" onclick="abrirModulo('unidade2')"><i class="fas fa-gavel"></i></button></li>
+        <li><button data-tooltip="Filosofia Africana" onclick="abrirModulo('unidade3')"><i class="fas fa-africa"></i></button></li>
+        <li><button data-tooltip="Mapa Conceptual" onclick="abrirModulo('mapa')"><i class="fas fa-sitemap"></i></button></li>
+        <li><button data-tooltip="← MATHX" onclick="voltarMathX()" style="border-color:var(--philo-gold);color:var(--philo-gold);"><i class="fas fa-arrow-left"></i></button></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <div class="app-container">
+
+    <!-- HEADER -->
+    <header class="philo-header">
+      <div class="philo-header-left">
+        <i class="fas fa-brain"></i>
+        <h1>PHILO<span>-X</span></h1>
+        <span class="badge">3 Unidades</span>
+      </div>
+      <div class="header-actions">
+        <button onclick="toggleTheme()" title="Alternar tema" id="themeToggle">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button class="btn-menu-toggle" id="menuToggleBtn" aria-label="Abrir menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- SEARCH -->
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="🔍 Pesquisar por palavra-chave..." onkeyup="buscarConteudo(event)">
+      <button onclick="buscarConteudo()"><i class="fas fa-search"></i></button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+
+    <!-- LISTA DE MÓDULOS -->
+    <div id="modulo-lista">
+      <div class="modules-grid">
+        <div class="module-card" onclick="abrirModulo('unidade1')">
+          <div class="card-header"><i class="fas fa-flask"></i><h3>Unidade 1: Filosofia e Ciência</h3></div>
+          <p class="card-desc">Relações históricas, método científico vs filosófico, ciência e ideologia, ética da ciência, desafios atuais.</p>
+        </div>
+
+        <div class="module-card" onclick="abrirModulo('unidade2')">
+          <div class="card-header"><i class="fas fa-gavel"></i><h3>Unidade 2: Filosofia Política</h3></div>
+          <p class="card-desc">Conceito de política, Estado e poder, Contrato Social, formas de governo, cidadania e DH, Estado Moçambicano.</p>
+        </div>
+
+        <div class="module-card" onclick="abrirModulo('unidade3')">
+          <div class="card-header"><i class="fas fa-africa"></i><h3>Unidade 3: Filosofia Africana</h3><span class="badge-new-tag">Destaque</span></div>
+          <p class="card-desc">Existência da Filosofia Africana, Filosofia Bantu, Ubuntu, problemas atuais de África, Filosofia Moçambicana.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PÁGINA DO MÓDULO -->
+    <div id="modulo-pagina" class="modulo-pagina">
+      <button class="btn-voltar" onclick="voltarLista()"><i class="fas fa-arrow-left"></i> Voltar à lista</button>
+      <div id="modulo-conteudo"></div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>
+        <span class="logo">PHILO</span><span class="logo-x">-X</span>
+        &nbsp;—&nbsp; Powered by <span class="powered">M4L!K</span>
+        &nbsp;—&nbsp; IDEA: <span class="powered">RAYKING👑</span>
+      </p>
+      <p style="color:var(--philo-muted);font-size:0.7rem;margin-top:0.3rem;">Ferramenta educativa de Filosofia — 12ª Classe</p>
+    </footer>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCRIPTS
+  ═══════════════════════════════════════ -->
+  <script>
+    // ============================================================
+    //  MENU CIRCULAR — VERSÃO CORRIGIDA
+    // ============================================================
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Menu circular
+      const menuToggleBtn = document.getElementById('menuToggleBtn');
+      const menuCloseBtn = document.getElementById('menuCloseBtn');
+      const menuOverlay = document.getElementById('menuOverlay');
+      const menuContainer = document.getElementById('menuContainer');
+      const menuKnob = document.getElementById('menuKnob');
+      const philoMenu = document.getElementById('philoMenu');
+
+      function abrirMenu() {
+        menuOverlay.classList.add('active');
+        menuContainer.classList.add('active');
+        philoMenu.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function fecharMenu() {
+        menuOverlay.classList.remove('active');
+        menuContainer.classList.remove('active');
+        philoMenu.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      if (menuToggleBtn) {
+        menuToggleBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (menuContainer.classList.contains('active')) {
+            fecharMenu();
+          } else {
+            abrirMenu();
+          }
+        });
+      }
+
+      if (menuCloseBtn) {
+        menuCloseBtn.addEventListener('click', fecharMenu);
+      }
+
+      if (menuOverlay) {
+        menuOverlay.addEventListener('click', fecharMenu);
+      }
+
+      if (menuKnob) {
+        menuKnob.addEventListener('click', function(e) {
+          e.stopPropagation();
+          philoMenu.classList.toggle('active');
+        });
+      }
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          fecharMenu();
+        }
+      });
+
+      document.querySelectorAll('.philo-menu li button').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          setTimeout(fecharMenu, 300);
+        });
+      });
+
+      // Tema
+      let temaEscuro = true;
+
+      window.toggleTheme = function() {
+        temaEscuro = !temaEscuro;
+        document.body.classList.toggle('light-mode', !temaEscuro);
+        const icon = document.querySelector('#themeToggle i');
+        if (temaEscuro) {
+          icon.className = 'fas fa-moon';
+        } else {
+          icon.className = 'fas fa-sun';
+        }
+      };
+
+      // Voltar MATHX
+      window.voltarMathX = function() {
+        window.location.href = 'index.html';
+      };
+
+      // Voltar lista
+      window.voltarLista = function() {
+        document.getElementById('modulo-lista').style.display = 'block';
+        document.getElementById('modulo-pagina').classList.remove('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      // Abrir módulo
+      window.abrirModulo = function(id) {
+        const lista = document.getElementById('modulo-lista');
+        const pagina = document.getElementById('modulo-pagina');
+        const conteudo = document.getElementById('modulo-conteudo');
+
+        lista.style.display = 'none';
+        pagina.classList.add('active');
+
+        if (id === 'mapa') {
+          conteudo.innerHTML = renderMapaConceptual();
+        } else {
+          switch (id) {
+            case 'unidade1':
+              conteudo.innerHTML = renderUnidade1();
+              break;
+            case 'unidade2':
+              conteudo.innerHTML = renderUnidade2();
+              break;
+            case 'unidade3':
+              conteudo.innerHTML = renderUnidade3();
+              break;
+            default:
+              conteudo.innerHTML =
+                `<div class="modulo-container"><h3 style="color:var(--philo-purple);">Unidade em desenvolvimento</h3><p style="color:var(--philo-muted);">Brevemente disponível.</p></div>`;
+          }
+        }
+
+        const primeiroTab = document.querySelector('.tab-btn.active');
+        if (primeiroTab) {
+          const targetId = primeiroTab.dataset.target;
+          document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+          const target = document.getElementById(targetId);
+          if (target) target.classList.add('active');
+        }
+
+        setTimeout(function() {
+          if (document.getElementById('philo-flashcard-front')) {
+            carregarFlashcardPhilo(0);
+          }
+        }, 100);
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      // Switch Tab
+      window.switchTab = function(btn, targetId) {
+        const parent = btn.closest('.inner-tabs');
+        if (!parent) return;
+        parent.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        const container = btn.closest('.modulo-container');
+        if (container) {
+          container.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+          const target = document.getElementById(targetId);
+          if (target) target.classList.add('active');
+        }
+      };
+
+      // Verificar exercício
+      window.verificarPhilo = function(btn, correta) {
+        const container = btn.closest('.philo-exercicio');
+        const selected = container.querySelector('input[type="radio"]:checked');
+        const feedback = container.querySelector('.resposta-feedback');
+
+        if (!selected) {
+          feedback.textContent = '⚠ Selecciona uma opção primeiro!';
+          feedback.className = 'resposta-feedback';
+          feedback.style.color = '#ff6b6b';
+          return;
+        }
+
+        if (selected.value === correta) {
+          feedback.textContent = '✅ Correto!';
+          feedback.className = 'resposta-feedback correto';
+        } else {
+          feedback.textContent = '❌ Incorreto. Tenta novamente!';
+          feedback.className = 'resposta-feedback errado';
+        }
+      };
+
+      // Flashcard
+      let flashcardPhiloAtual = 0;
+      let flashcardPhiloVirado = false;
+      let philoFlashcards = [];
+
+      window.carregarFlashcardPhilo = function(index) {
+        const card = philoFlashcards[index];
+        if (!card) return;
+        document.getElementById('philo-flashcard-front').textContent = card.frente;
+        document.getElementById('philo-flashcard-back').textContent = card.verso;
+        document.getElementById('philo-flashcard-inner').classList.remove('flipped');
+        flashcardPhiloVirado = false;
+        document.getElementById('philo-flashcard-counter').textContent = index + 1 + ' / ' + philoFlashcards.length;
+      };
+
+      window.virarFlashcardPhilo = function() {
+        const inner = document.getElementById('philo-flashcard-inner');
+        flashcardPhiloVirado = !flashcardPhiloVirado;
+        if (flashcardPhiloVirado) {
+          inner.classList.add('flipped');
+        } else {
+          inner.classList.remove('flipped');
+        }
+      };
+
+      window.flashcardPhiloAnterior = function() {
+        if (flashcardPhiloAtual > 0) {
+          flashcardPhiloAtual--;
+          carregarFlashcardPhilo(flashcardPhiloAtual);
+        }
+      };
+
+      window.flashcardPhiloProximo = function() {
+        if (flashcardPhiloAtual < philoFlashcards.length - 1) {
+          flashcardPhiloAtual++;
+          carregarFlashcardPhilo(flashcardPhiloAtual);
+        }
+      };
+
+      // Pesquisa
+      const searchIndex = [];
+
+      function buildSearchIndex() {
+        const modules = [
+          { id: 'unidade1', titulo: 'Filosofia e Ciência',
+          desc: 'Relações históricas, método científico, ética da ciência' },
+          { id: 'unidade2', titulo: 'Filosofia Política', desc: 'Estado, poder, Contrato Social, formas de governo' },
+          { id: 'unidade3', titulo: 'Filosofia Africana', desc: 'Filosofia Bantu, Ubuntu, Samora Machel' }
+        ];
+
+        const termos = [
+          'Filosofia mãe das ciências', 'Galileu separação ciência filosofia',
+          'Método científico observação hipótese experimentação',
+          'Método filosófico reflexão argumentação lógica',
+          'Bacon neutralidade ciência mito', 'Popper falseabilidade',
+          'Kuhn paradigma revolução científica',
+          'Ética da ciência limites experimentação',
+          'IA biotecnologia crise ambiental',
+          'Pólis grega Aristóteles animal político',
+          'Maquiavel O Príncipe poder', 'Hobbes Leviatã guerra todos contra todos',
+          'Locke direitos naturais vida liberdade propriedade',
+          'Rousseau Contrato Social homem nasce bom sociedade corrompe',
+          'Democracia ditadura república', 'DUDH 1948',
+          'Constituição Moçambique 2004', 'Estado Moçambicano Executivo Legislativo Judiciário',
+          'Tempels Filosofia Bantu ser força vital',
+          'Kagame ontologia Bantu', 'Ubuntu eu sou porque nós somos',
+          'Neocolonialismo dependência', 'Wiredu Hountondji',
+          'Eduardo Mondlane liberdade', 'Samora Machel a luta continua'
+        ];
+
+        searchIndex.length = 0;
+        modules.forEach(function(m) {
+          searchIndex.push({ ...m, tipo: 'modulo' });
+        });
+        termos.forEach(function(texto) {
+          var moduloId = 'unidade1';
+          if (texto.includes('Política') || texto.includes('Aristóteles') || texto.includes('Maquiavel') ||
+            texto.includes('Hobbes') || texto.includes('Locke') || texto.includes('Rousseau') ||
+            texto.includes('democracia') || texto.includes('ditadura') || texto.includes('DUDH') ||
+            texto.includes('Constituição') || texto.includes('Moçambicano')) {
+            moduloId = 'unidade2';
+          } else if (texto.includes('Tempels') || texto.includes('Bantu') || texto.includes('Ubuntu') ||
+            texto.includes('Neocolonialismo') || texto.includes('Mondlane') || texto.includes('Machel') ||
+            texto.includes('África') || texto.includes('africana')) {
+            moduloId = 'unidade3';
+          }
+          var modulo = modules.find(function(m) { return m.id === moduloId; });
+          searchIndex.push({
+            id: moduloId,
+            titulo: modulo ? modulo.titulo : 'Unidade',
+            desc: texto,
+            tipo: 'termo',
+            texto: texto
+          });
+        });
+      }
+
+      window.buscarConteudo = function(event) {
+        const input = document.getElementById('searchInput');
+        const results = document.getElementById('searchResults');
+        const query = input.value.toLowerCase().trim();
+
+        if (event && event.key === 'Enter') {
+          event.preventDefault();
+        }
+
+        if (query.length < 2) {
+          results.classList.remove('active');
+          return;
+        }
+
+        buildSearchIndex();
+
+        var resultados = searchIndex.filter(function(item) {
+          return item.titulo.toLowerCase().includes(query) ||
+            item.desc.toLowerCase().includes(query);
+        });
+
+        if (resultados.length === 0) {
+          results.innerHTML = '<div class="no-results">Nenhum resultado encontrado para "' + query + '"</div>';
+          results.classList.add('active');
+          return;
+        }
+
+        results.innerHTML = resultados.slice(0, 10).map(function(item) {
+          return '<div class="result-item" onclick="abrirModulo(\'' + item.id + '\')">' +
+            '<div class="titulo">' + (item.tipo === 'modulo' ? '📚' : '📖') + ' ' + item.titulo + '</div>' +
+            '<div class="desc">' + item.desc.substring(0, 100) + (item.desc.length > 100 ? '...' : '') + '</div>' +
+            '</div>';
+        }).join('');
+
+        results.classList.add('active');
+      };
+
+      // ============================================================
+      //  CONTEÚDO DAS UNIDADES
+      // ============================================================
+
+      // DADOS UNIDADE 1
+      var dadosUnidade1 = {
+        apontamentos: [{
+          titulo: '1.1 Relações históricas entre Filosofia e Ciência',
+          conteudo: '<p>A Filosofia é considerada a <span class="destaque">"mãe" das ciências</span>. Os filósofos gregos (Tales de Mileto, Pitágoras, Aristóteles) já faziam observações sistemáticas da natureza.</p><p><span class="destaque">Galileu Galilei</span> (séc. XVII) marca a separação entre ciência e filosofia. Atualmente, há um diálogo interdisciplinar entre as duas áreas.</p><p>A ciência responde ao <span class="destaque">"como"</span>; a filosofia responde ao <span class="destaque">"porquê"</span>.</p>'
+        }, {
+          titulo: '1.2 Método científico vs Método filosófico',
+          conteudo: '<table class="tabela-comparativa"><tr><th>Método Científico</th><th>Método Filosófico</th></tr><tr><td>Observação empírica</td><td>Reflexão racional</td></tr><tr><td>Formulação de hipóteses</td><td>Argumentação lógica</td></tr><tr><td>Experimentação</td><td>Questionamento crítico</td></tr><tr><td>Conclusão baseada em dados</td><td>Conclusão baseada em raciocínio</td></tr><tr><td>Objetividade</td><td>Subjetividade crítica</td></tr></table><p>São <span class="destaque">complementares</span>: a ciência precisa da filosofia para refletir sobre os seus limites.</p>'
+        }, {
+          titulo: '1.3 Ciência e Ideologia',
+          conteudo: '<p><span class="destaque">Francis Bacon (1561-1626)</span>: defende que a ciência deve servir a humanidade. A neutralidade da ciência é um mito.</p><p><span class="destaque">Karl Popper (1902-1994)</span>: propõe o critério da <span class="destaque">falseabilidade</span> — uma teoria é científica se pode ser falseada.</p><p><span class="destaque">Thomas Kuhn (1922-1996)</span>: introduz o conceito de <span class="destaque">paradigma</span> — a ciência avança por revoluções paradigmáticas.</p>'
+        }, {
+          titulo: '1.4 Ética da ciência e tecnologia',
+          conteudo: '<p>Limites da experimentação: clonagem humana, manipulação genética.</p><p>Responsabilidade do cientista: <span class="destaque">não fazer tudo o que é tecnicamente possível</span>.</p><p>Princípio da <span class="destaque">precaução</span>: evitar riscos desnecessários.</p>'
+        }, {
+          titulo: '1.5 Desafios da ciência atual',
+          conteudo: '<p><span class="destaque">Inteligência Artificial</span>: ética dos algoritmos, vieses, privacidade.</p><p><span class="destaque">Biotecnologia</span>: edição genética (CRISPR), implicações éticas.</p><p><span class="destaque">Crise ambiental</span>: papel da ciência na sustentabilidade do planeta.</p>'
+        }],
+        exercicios: [{
+          pergunta: 'Quem marcou a separação entre ciência e filosofia?',
+          opcoes: ['Aristóteles', 'Galileu Galilei', 'Platão', 'Tales de Mileto'],
+          correta: 'B'
+        }, {
+          pergunta: 'O método filosófico baseia-se principalmente em:',
+          opcoes: ['Observação empírica', 'Experimentação', 'Reflexão racional e argumentação lógica',
+            'Coleta de dados estatísticos'
+          ],
+          correta: 'C'
+        }, {
+          pergunta: 'Para Karl Popper, uma teoria é científica se:',
+          opcoes: ['For confirmada por todos os cientistas', 'Puder ser falseada', 'For útil para a sociedade',
+            'For aceita pela maioria'
+          ],
+          correta: 'B'
+        }, {
+          pergunta: 'Qual é a principal preocupação da ética da ciência?',
+          opcoes: ['Aumentar os lucros das empresas', 'Acelerar as descobertas científicas',
+            'Estabelecer limites e responsabilidades na experimentação', 'Reduzir o financiamento da pesquisa'
+          ],
+          correta: 'C'
+        }, {
+          pergunta: 'Thomas Kuhn introduziu o conceito de:',
+          opcoes: ['Falseabilidade', 'Neutralidade científica', 'Paradigma', 'Contrato social'],
+          correta: 'C'
+        }],
+        solucoes: ['B — Galileu Galilei', 'C — Reflexão racional e argumentação lógica', 'B — Puder ser falseada',
+          'C — Estabelecer limites e responsabilidades na experimentação', 'C — Paradigma'
+        ],
+        flashcards: [
+          { frente: 'Quem separou a ciência da filosofia?', verso: 'Galileu Galilei (séc. XVII)' },
+          { frente: 'O que é o método filosófico?', verso: 'Reflexão racional e argumentação lógica' },
+          { frente: 'O que é falseabilidade?', verso: 'Critério de Popper: uma teoria é científica se pode ser falseada' },
+          { frente: 'O que é um paradigma para Kuhn?', verso: 'Conjunto de crenças que orientam a ciência' },
+          { frente: 'Quem defendeu a neutralidade da ciência como mito?', verso: 'Francis Bacon' },
+          { frente: 'O que é o princípio da precaução?', verso: 'Evitar riscos desnecessários na ciência' },
+          { frente: 'Qual é um desafio atual da ciência?', verso: 'IA, biotecnologia, crise ambiental' },
+          { frente: 'A ciência responde ao "como"; a filosofia responde ao...', verso: '"Porquê"' }
+        ],
+        timeline: [
+          { ano: 'Séc. VI a.C.', desc: 'Tales de Mileto — início da filosofia ocidental' },
+          { ano: 'Séc. IV a.C.', desc: 'Aristóteles — sistematização do conhecimento' },
+          { ano: 'Séc. XVII', desc: 'Galileu — separação entre ciência e filosofia' },
+          { ano: '1620', desc: 'Bacon — "Novo Organum", método científico' },
+          { ano: '1934', desc: 'Popper — "A Lógica da Investigação Científica"' },
+          { ano: '1962', desc: 'Kuhn — "A Estrutura das Revoluções Científicas"' },
+          { ano: 'Actualidade', desc: 'Desafios: IA, biotecnologia, crise ambiental' }
+        ]
+      };
+
+      // DADOS UNIDADE 2
+      var dadosUnidade2 = {
+        apontamentos: [{
+          titulo: '2.1 Conceito de Política',
+          conteudo: '<p>Origem: <span class="destaque">pólis</span> grega (cidade-estado).</p><p><span class="destaque">Aristóteles (384-322 a.C.)</span>: "o homem é um animal político".</p><p>A política é a arte de governar e organizar a sociedade. Hoje: atividade que regula as relações de poder na sociedade.</p>'
+        }, {
+          titulo: '2.2 Estado e Poder',
+          conteudo: '<table class="tabela-comparativa"><tr><th>Filósofo</th><th>Obra</th><th>Ideia Principal</th></tr><tr><td>Maquiavel</td><td>"O Príncipe" (1513)</td><td>O poder é um fim em si mesmo; "os fins justificam os meios"</td></tr><tr><td>Hobbes</td><td>"Leviatã" (1651)</td><td>Estado de natureza = guerra de todos contra todos; o Estado é necessário</td></tr><tr><td>Locke</td><td>"Ensaio sobre o Governo Civil" (1690)</td><td>Direitos naturais: vida, liberdade, propriedade</td></tr><tr><td>Rousseau</td><td>"Contrato Social" (1762)</td><td>O homem nasce bom, a sociedade o corrompe</td></tr></table>'
+        }, {
+          titulo: '2.3 Contrato Social',
+          conteudo: '<p>Acordo implícito entre governantes e governados.</p><p>O povo cede alguns direitos em troca de proteção e segurança.</p><p>Se o Estado falha no seu dever, o povo tem direito à <span class="destaque">revolução</span> (Rousseau).</p><p>Base do <span class="destaque">Estado moderno</span>.</p>'
+        }, {
+          titulo: '2.4 Formas de governo',
+          conteudo: '<p><span class="destaque">Democracia</span>: poder do povo (governo do povo, pelo povo, para o povo).</p><p><span class="destaque">Ditadura</span>: poder concentrado num só (autoritário, sem participação popular).</p><p><span class="destaque">República</span>: poder exercido por representantes eleitos pelo povo.</p><p><span class="destaque">Monarquia</span>: poder hereditário (rei/rainha).</p>'
+        }, {
+          titulo: '2.5 Cidadania e Direitos Humanos',
+          conteudo: '<p>Declaração Universal dos Direitos Humanos (1948): direitos fundamentais.</p><p>Constituição da República de Moçambique (2004).</p><p>Direitos: civis, políticos, económicos, sociais, culturais.</p><p>A cidadania implica <span class="destaque">deveres e direitos</span>.</p>'
+        }, {
+          titulo: '2.6 Estado Moçambicano',
+          conteudo: '<p>Organização: <span class="destaque">Executivo, Legislativo, Judiciário</span>.</p><p>Presidente da República (Chefe de Estado e de Governo).</p><p>Assembleia da República (poder legislativo).</p><p>Desafios: descentralização, participação cidadã, combate à corrupção.</p>'
+        }],
+        exercicios: [{
+          pergunta: 'Aristóteles definiu o homem como:',
+          opcoes: ['Um ser racional', 'Um animal político', 'Um ser divino', 'Um animal social'],
+          correta: 'B'
+        }, {
+          pergunta: 'Para Hobbes, no estado de natureza, os homens vivem em:',
+          opcoes: ['Harmonia', 'Guerra de todos contra todos', 'Cooperação mútua', 'Igualdade perfeita'],
+          correta: 'B'
+        }, {
+          pergunta: 'O "Contrato Social" defendido por Rousseau afirma que:',
+          opcoes: ['O homem nasce mau, a sociedade o torna bom', 'O homem nasce bom, a sociedade o corrompe',
+            'O homem é naturalmente solitário', 'O Estado é desnecessário'
+          ],
+          correta: 'B'
+        }, {
+          pergunta: 'A Declaração Universal dos Direitos Humanos foi proclamada em:',
+          opcoes: ['1945', '1948', '1950', '1960'],
+          correta: 'B'
+        }, {
+          pergunta: 'Em Moçambique, o poder legislativo é exercido pela:',
+          opcoes: ['Presidência da República', 'Assembleia da República', 'Governo', 'Tribunais'],
+          correta: 'B'
+        }],
+        solucoes: ['B — Um animal político', 'B — Guerra de todos contra todos',
+          'B — O homem nasce bom, a sociedade o corrompe', 'B — 1948', 'B — Assembleia da República'
+        ],
+        flashcards: [
+          { frente: 'Quem disse "o homem é um animal político"?', verso: 'Aristóteles' },
+          { frente: 'Quem escreveu "Leviatã"?', verso: 'Thomas Hobbes' },
+          { frente: 'O que defendeu John Locke?', verso: 'Direitos naturais: vida, liberdade, propriedade' },
+          { frente: 'Quem escreveu "Contrato Social"?', verso: 'Jean-Jacques Rousseau' },
+          { frente: 'O que é o Contrato Social?', verso: 'Acordo implícito entre governantes e governados' },
+          { frente: 'Em que ano foi proclamada a DUDH?', verso: '1948' },
+          { frente: 'Quais são os três poderes do Estado?', verso: 'Executivo, Legislativo, Judiciário' },
+          { frente: 'Quem escreveu "O Príncipe"?', verso: 'Nicolau Maquiavel' }
+        ],
+        timeline: [
+          { ano: 'Séc. IV a.C.', desc: 'Aristóteles: "o homem é animal político"' },
+          { ano: '1513', desc: 'Maquiavel: "O Príncipe"' },
+          { ano: '1651', desc: 'Hobbes: "Leviatã"' },
+          { ano: '1690', desc: 'Locke: "Ensaio sobre o Governo Civil"' },
+          { ano: '1762', desc: 'Rousseau: "Contrato Social"' },
+          { ano: '1948', desc: 'Declaração Universal dos Direitos Humanos' },
+          { ano: '2004', desc: 'Constituição da República de Moçambique' }
+        ]
+      };
+
+      // DADOS UNIDADE 3
+      var dadosUnidade3 = {
+        apontamentos: [{
+          titulo: '3.1 Existência da Filosofia Africana',
+          conteudo: '<p><span class="destaque">Debate</span>: existe filosofia africana ou apenas etnofilosofia?</p><p><span class="destaque">Placide Tempels (1906-1977)</span>: "Filosofia Bantu" – primeiro a sistematizar o pensamento africano.</p><p><span class="destaque">Paul Hountondji (1942-2024)</span>: crítico da etnofilosofia, defende uma filosofia académica universal.</p><p><span class="destaque">Kwasi Wiredu (1931-2022)</span>: filosofia africana como crítica e reflexão, com valor universal.</p>'
+        }, {
+          titulo: '3.2 Filosofia Bantu',
+          conteudo: '<p><span class="destaque">Tempels</span>: o ser é <span class="destaque">força vital</span> (ontologia da força).</p><p><span class="destaque">Alexis Kagame (1912-1981)</span>: categorias do ser na filosofia Bantu.</p><p>Visão holística do mundo: <span class="destaque">tudo está interligado</span>.</p><p>Os antepassados continuam presentes na vida dos vivos.</p>'
+        }, {
+          titulo: '3.3 Ubuntu',
+          conteudo: '<p><span class="destaque">"Eu sou porque nós somos"</span> (máxima Zulu).</p><p>Humanismo africano baseado na <span class="destaque">solidariedade e comunidade</span>.</p><p>Valores fundamentais: compaixão, partilha, dignidade, respeito.</p><p>O indivíduo só existe em relação à comunidade.</p>'
+        }, {
+          titulo: '3.4 Problemas atuais de África',
+          conteudo: '<p><span class="destaque">Neocolonialismo</span>: dependência económica e cultural dos países africanos.</p><p><span class="destaque">Identidade</span>: conciliar tradição e modernidade.</p><p><span class="destaque">Desenvolvimento</span>: necessidade de caminhos próprios, não importados.</p><p>Paz e estabilidade: conflitos, democracia, governação.</p>'
+        }, {
+          titulo: '3.5 Filosofia Moçambicana',
+          conteudo: '<p><span class="destaque">Eduardo Mondlane (1920-1969)</span>: liberdade, justiça social, unidade nacional.</p><p><span class="destaque">Samora Machel (1933-1986)</span>: "a luta continua", emancipação do povo.</p><p>Pensamento anti-colonial: resgate da identidade moçambicana.</p><p>Construção da nação: superação das divisões étnicas e regionais.</p>'
+        }],
+        exercicios: [{
+          pergunta: '"Eu sou porque nós somos" é a máxima filosófica do:',
+          opcoes: ['Ubuntu', 'Neocolonialismo', 'Contrato Social', 'Método científico'],
+          correta: 'A'
+        }, {
+          pergunta: 'O autor de "Filosofia Bantu" é:',
+          opcoes: ['Paul Hountondji', 'Kwasi Wiredu', 'Placide Tempels', 'Samora Machel'],
+          correta: 'C'
+        }, {
+          pergunta: 'A Filosofia Bantu define o ser como:',
+          opcoes: ['Matéria', 'Ideia', 'Força vital', 'Sombra'],
+          correta: 'C'
+        }, {
+          pergunta: 'Eduardo Mondlane e Samora Machel são figuras importantes da:',
+          opcoes: ['Filosofia europeia', 'Filosofia moçambicana', 'Filosofia grega', 'Filosofia asiática'],
+          correta: 'B'
+        }, {
+          pergunta: 'O neocolonialismo refere-se à:',
+          opcoes: ['Independência total dos países africanos', 'Dependência económica e cultural dos países africanos',
+            'Aliança entre países africanos', 'Industrialização de África'
+          ],
+          correta: 'B'
+        }],
+        solucoes: ['A — Ubuntu', 'C — Placide Tempels', 'C — Força vital', 'B — Filosofia moçambicana',
+          'B — Dependência económica e cultural dos países africanos'
+        ],
+        flashcards: [
+          { frente: 'O que é Ubuntu?', verso: '"Eu sou porque nós somos" – humanismo africano' },
+          { frente: 'Quem escreveu "Filosofia Bantu"?', verso: 'Placide Tempels' },
+          { frente: 'O que é a Filosofia Bantu?', verso: 'Ontologia: o ser é força vital' },
+          { frente: 'Quem foi Paul Hountondji?', verso: 'Crítico da etnofilosofia, defende filosofia académica' },
+          { frente: 'O que defendeu Eduardo Mondlane?', verso: 'Liberdade, justiça social, unidade nacional' },
+          { frente: 'O que é o neocolonialismo?', verso: 'Dependência económica e cultural dos países africanos' },
+          { frente: 'Quem disse "a luta continua"?', verso: 'Samora Machel' },
+          { frente: 'O que é a Filosofia Moçambicana?', verso: 'Pensamento de Mondlane, Machel, anti-colonial' }
+        ],
+        timeline: [
+          { ano: '1945-1960', desc: 'Período das independências africanas' },
+          { ano: '1956', desc: 'Tempels: "Filosofia Bantu"' },
+          { ano: '1975', desc: 'Independência de Moçambique' },
+          { ano: '1986', desc: 'Morte de Samora Machel' },
+          { ano: '1990', desc: 'Fim do Apartheid na África do Sul' },
+          { ano: '2000+', desc: 'Renascimento do pensamento africano' }
+        ]
+      };
+
+      // FUNÇÕES RENDER
+      window.renderUnidade1 = function() {
+        return gerarHTMLUnidade('1', 'Filosofia e Ciência', 'flask', dadosUnidade1);
+      };
+
+      window.renderUnidade2 = function() {
+        return gerarHTMLUnidade('2', 'Filosofia Política', 'gavel', dadosUnidade2);
+      };
+
+      window.renderUnidade3 = function() {
+        return gerarHTMLUnidade('3', 'Filosofia Africana', 'africa', dadosUnidade3);
+      };
+
+      function gerarHTMLUnidade(num, titulo, icone, dados) {
+        var id = 'unidade' + num;
+        var apontamentosId = 'philo' + num + '-apontamentos';
+        var exerciciosId = 'philo' + num + '-exercicios';
+        var solucoesId = 'philo' + num + '-solucoes';
+        var flashcardsId = 'philo' + num + '-flashcards';
+        var timelineId = 'philo' + num + '-timeline';
+
+        var html = '';
+        html += '<div class="modulo-container" data-unidade="' + id + '">';
+        html += '<div class="card-header">';
+        html += '<i class="fas fa-' + icone + '" style="font-size:1.6rem;color:var(--philo-gold);"></i>';
+        html += '<h2 style="color:var(--philo-purple);">Unidade ' + num + ': ' + titulo + '</h2>';
+        html += '</div>';
+
+        html += '<div class="inner-tabs">';
+        html += '<button class="tab-btn active" data-target="' + apontamentosId + '" onclick="switchTab(this, \'' +
+          apontamentosId + '\')">📖 Apontamentos</button>';
+        html += '<button class="tab-btn" data-target="' + exerciciosId + '" onclick="switchTab(this, \'' + exerciciosId +
+          '\')">✍️ Exercícios</button>';
+        html += '<button class="tab-btn" data-target="' + solucoesId + '" onclick="switchTab(this, \'' + solucoesId +
+          '\')">✅ Soluções</button>';
+        html += '<button class="tab-btn" data-target="' + flashcardsId + '" onclick="switchTab(this, \'' + flashcardsId +
+          '\')">🃏 Flashcards</button>';
+        html += '<button class="tab-btn" data-target="' + timelineId + '" onclick="switchTab(this, \'' + timelineId +
+          '\')">📅 Timeline</button>';
+        html += '</div>';
+
+        // Apontamentos
+        html += '<div class="tab-content active" id="' + apontamentosId + '">';
+        dados.apontamentos.forEach(function(a) {
+          html += '<div class="philo-apontamento"><h4>' + a.titulo + '</h4>' + a.conteudo + '</div>';
+        });
+        html += '</div>';
+
+        // Exercícios
+        html += '<div class="tab-content" id="' + exerciciosId + '">';
+        dados.exercicios.forEach(function(ex, i) {
+          html += '<div class="philo-exercicio" data-exercicio="' + (i + 1) + '">';
+          html += '<div class="pergunta">' + (i + 1) + '. ' + ex.pergunta + '</div>';
+          html += '<div class="opcoes">';
+          ex.opcoes.forEach(function(op, j) {
+            html += '<label><input type="radio" name="philo' + num + '-ex' + (i + 1) + '" value="' + String
+              .fromCharCode(65 + j) + '"> ' + op + '</label>';
+          });
+          html += '</div>';
+          html += '<button class="btn-verificar" onclick="verificarPhilo(this, \'' + ex.correta +
+            '\')">Verificar</button>';
+          html += '<div class="resposta-feedback"></div>';
+          html += '</div>';
+        });
+        html += '</div>';
+
+        // Soluções
+        html += '<div class="tab-content" id="' + solucoesId + '">';
+        dados.solucoes.forEach(function(s, i) {
+          html += '<div class="philo-solucao"><div class="solucao-titulo">📌 Exercício ' + (i + 1) +
+            '</div><div class="solucao-texto">Resposta: <strong>' + s + '</strong></div></div>';
+        });
+        html += '</div>';
+
+        // Flashcards
+        html += '<div class="tab-content" id="' + flashcardsId + '">';
+        html += '<div id="philo-flashcard-container">';
+        html += '<div class="philo-flashcard" onclick="virarFlashcardPhilo()">';
+        html += '<div class="card-inner" id="philo-flashcard-inner">';
+        html += '<div class="card-front" id="philo-flashcard-front">Carregando...</div>';
+        html += '<div class="card-back" id="philo-flashcard-back">Carregando...</div>';
+        html += '</div></div>';
+        html += '<div class="flashcard-counter" id="philo-flashcard-counter">1 / ' + dados.flashcards.length + '</div>';
+        html += '<div class="flashcard-nav">';
+        html += '<button onclick="flashcardPhiloAnterior()">◀ Anterior</button>';
+        html += '<button onclick="flashcardPhiloProximo()">Próximo ▶</button>';
+        html += '</div></div>';
+        html += '</div>';
+
+        // Timeline
+        html += '<div class="tab-content" id="' + timelineId + '">';
+        html += '<div class="philo-timeline">';
+        dados.timeline.forEach(function(t) {
+          html += '<div class="evento"><span class="ano">' + t.ano + '</span><span class="desc">' + t.desc +
+            '</span></div>';
+        });
+        html += '</div></div>';
+
+        html += '</div>';
+
+        // Guardar flashcards para inicialização
+        philoFlashcards = dados.flashcards;
+
+        return html;
+      }
+
+      // MAPA CONCEPTUAL
+      window.renderMapaConceptual = function() {
+        return '<div class="modulo-container">' +
+          '<div class="card-header"><i class="fas fa-sitemap" style="font-size:1.6rem;color:var(--philo-gold);"></i><h2 style="color:var(--philo-purple);">Mapa Conceptual — Filosofia</h2></div>' +
+          '<div class="mapa-conceptual">' +
+          '<div class="mapa-nodo central">🧠 FILOSOFIA</div>' +
+          '<div class="mapa-conexao">│</div>' +
+          '<div class="mapa-linha">' +
+          '<div class="mapa-nodo">🔬 Filosofia e Ciência</div>' +
+          '<div class="mapa-nodo">⚖️ Filosofia Política</div>' +
+          '<div class="mapa-nodo">🌍 Filosofia Africana</div>' +
+          '</div>' +
+          '<div class="mapa-conexao">│</div>' +
+          '<div class="mapa-linha">' +
+          '<div><div class="mapa-nodo sub">• Relações históricas</div><div class="mapa-nodo sub">• Método científico vs filosófico</div><div class="mapa-nodo sub">• Ciência e Ideologia</div><div class="mapa-nodo sub">• Ética da ciência</div><div class="mapa-nodo sub">• Desafios atuais</div></div>' +
+          '<div><div class="mapa-nodo sub">• Conceito de Política</div><div class="mapa-nodo sub">• Estado e Poder</div><div class="mapa-nodo sub">• Contrato Social</div><div class="mapa-nodo sub">• Formas de governo</div><div class="mapa-nodo sub">• Cidadania e DH</div><div class="mapa-nodo sub">• Estado Moçambicano</div></div>' +
+          '<div><div class="mapa-nodo sub">• Existência da Filosofia Africana</div><div class="mapa-nodo sub">• Filosofia Bantu</div><div class="mapa-nodo sub">• Ubuntu</div><div class="mapa-nodo sub">• Problemas atuais de África</div><div class="mapa-nodo sub">• Filosofia Moçambicana</div></div>' +
+          '</div>' +
+          '<div class="mapa-conexao">│</div>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin-top:0.5rem;">' +
+          '<span style="background:var(--philo-purple);color:#0d0a14;padding:0.3rem 0.8rem;border-radius:999px;font-size:0.7rem;font-weight:700;">📖 Apontamentos</span>' +
+          '<span style="background:var(--philo-gold);color:#0d0a14;padding:0.3rem 0.8rem;border-radius:999px;font-size:0.7rem;font-weight:700;">✍️ Exercícios</span>' +
+          '<span style="background:var(--philo-purple);color:#0d0a14;padding:0.3rem 0.8rem;border-radius:999px;font-size:0.7rem;font-weight:700;">✅ Soluções</span>' +
+          '<span style="background:var(--philo-gold);color:#0d0a14;padding:0.3rem 0.8rem;border-radius:999px;font-size:0.7rem;font-weight:700;">🃏 Flashcards</span>' +
+          '<span style="background:var(--philo-purple);color:#0d0a14;padding:0.3rem 0.8rem;border-radius:999px;font-size:0.7rem;font-weight:700;">📅 Timeline</span>' +
+          '</div></div></div>';
+      };
+
+      // Inicializar
+      document.getElementById('modulo-lista').style.display = 'block';
+      document.getElementById('modulo-pagina').classList.remove('active');
+
+      if (philoFlashcards.length > 0) {
+        setTimeout(function() {
+          if (document.getElementById('philo-flashcard-front')) {
+            carregarFlashcardPhilo(0);
+          }
+        }, 200);
+      }
+
+      console.log('🧠 PHILO-X carregado com sucesso!');
+    });
+    // ─── MASCOTE PHILOBOT — com óculos 🤓 ───
+
+document.addEventListener('DOMContentLoaded', function() {
+  var mascote = document.getElementById('mascote');
+  if (!mascote) return;
+
+  var pupilLeft = document.getElementById('pupil-left');
+  var pupilRight = document.getElementById('pupil-right');
+  
+  var targetX = window.innerWidth / 2;
+  var targetY = window.innerHeight / 2;
+  var isHappy = false;
+  
+  function updateMascote() {
+    var dx = (targetX - window.innerWidth / 2) * 0.03;
+    var dy = (targetY - window.innerHeight / 2) * 0.03;
+    
+    if (pupilLeft && pupilRight) {
+      pupilLeft.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
+      pupilRight.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
+    }
+    requestAnimationFrame(updateMascote);
+  }
+  
+  document.addEventListener('mousemove', function(e) {
+    targetX = e.clientX;
+    targetY = e.clientY;
+  });
+  
+  document.addEventListener('touchmove', function(e) {
+    var touch = e.touches[0];
+    if (touch) {
+      targetX = touch.clientX;
+      targetY = touch.clientY;
+    }
+  }, { passive: true });
+  
+  document.addEventListener('click', function() {
+    if (!isHappy) {
+      mascote.classList.add('happy');
+      isHappy = true;
+      mascote.style.transform = 'scale(1.2)';
+      setTimeout(function() {
+        mascote.style.transform = 'scale(1)';
+        setTimeout(function() {
+          mascote.classList.remove('happy');
+          isHappy = false;
+        }, 600);
+      }, 150);
+    }
+  });
+  
+  document.addEventListener('touchstart', function() {
+    if (!isHappy) {
+      mascote.classList.add('happy');
+      isHappy = true;
+      mascote.style.transform = 'scale(1.2)';
+      setTimeout(function() {
+        mascote.style.transform = 'scale(1)';
+        setTimeout(function() {
+          mascote.classList.remove('happy');
+          isHappy = false;
+        }, 600);
+      }, 150);
+    }
+  }, { passive: true });
+  
+  updateMascote();
+});
+  </script>
+  <!-- ═══════════════════════════════════════
+     MASCOTE PHILOBOT
+═══════════════════════════════════════ -->
+<div class="mascote-container" id="mascote">
+  <div class="mascote-body">
+    <div class="mascote-antena mascote-antena-left"></div>
+    <div class="mascote-antena mascote-antena-right"></div>
+    <div class="mascote-glow"></div>
+
+    <!-- ÓCULOS -->
+    <div class="mascote-oculos">
+      <div class="oculos-lente oculos-lente-left">
+        <div class="mascote-eye"><div class="mascote-pupil" id="pupil-left"></div></div>
+      </div>
+      <div class="oculos-ponte"></div>
+      <div class="oculos-lente oculos-lente-right">
+        <div class="mascote-eye"><div class="mascote-pupil" id="pupil-right"></div></div>
+      </div>
+      <div class="oculos-haste oculos-haste-left"></div>
+      <div class="oculos-haste oculos-haste-right"></div>
+    </div>
+
+    <div class="mascote-mouth"></div>
+    <div class="mascote-label">PHILOBOT</div>
+  </div>
+</div>
+
+</body>
+</html>
