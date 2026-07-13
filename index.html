@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MATHX — X Ecosystem</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script type="module" src="quiz-firebase.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     BOOT SCREEN
+═══════════════════════════════════════ -->
+<div id="boot-screen">
+  <canvas id="particles-canvas"></canvas>
+  <div class="boot-container">
+    <div class="boot-logo">
+      <span class="logo-math">MATH</span><span class="logo-x">X</span>
+    </div>
+    <div class="boot-loader"><div class="boot-bar"></div></div>
+    <div class="boot-status" id="boot-status">Inicializando...</div>
+    <div class="boot-powered">POWERED BY M4L!K</div>
+  </div>
+</div>
+
+<script>
+  
+  (function() {
+    console.log('🚀 Boot screen iniciado');
+    var bootScreen = document.getElementById('boot-screen');
+    var statusEl = document.getElementById('boot-status');
+    if (!bootScreen || !statusEl) { console.error('❌ Elementos do boot não encontrados'); return; }
+
+    var canvas = document.getElementById('particles-canvas');
+    var ctx = canvas.getContext('2d');
+    var width, height;
+
+    var symbols = ['∑','∫','π','√','∞','Δ','∂','α','β','γ','θ','λ','⚡','🔬','🌌','⚛️','🧲','📡','🔭','🌀','🧪','💧','🧬','🌿','🧫','🧠','🦠','🌱','🌍','🗺️','🏔️','🏛️','📜','⚖️','💡'];
+
+    function resizeCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    var particles = [];
+    var NUM_PARTICLES = 160;
+    function randomColor() { var colors = ['#4fa3ff','#ff7b2c','#00c896','#a855f7','#f59e0b','#3b82f6','#ec4899']; return colors[Math.floor(Math.random() * colors.length)]; }
+    function createParticle() { return { x: Math.random() * width, y: Math.random() * height, size: 14 + Math.random() * 16, speedX: (Math.random() - 0.5) * 0.3, speedY: (Math.random() - 0.5) * 0.3, symbol: symbols[Math.floor(Math.random() * symbols.length)], color: randomColor(), rotation: Math.random() * Math.PI * 2, rotationSpeed: (Math.random() - 0.5) * 0.02, opacity: 0.05 + Math.random() * 0.05, life: 0, maxLife: 200 + Math.random() * 300 }; }
+    for (var i = 0; i < NUM_PARTICLES; i++) particles.push(createParticle());
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, width, height);
+      for (var i = 0; i < particles.length; i++) {
+        var p = particles[i];
+        p.x += p.speedX; p.y += p.speedY; p.rotation += p.rotationSpeed; p.life++;
+        if (p.x < -50 || p.x > width + 50 || p.y < -50 || p.y > height + 50 || p.life > p.maxLife) { particles[i] = createParticle(); particles[i].life = 0; }
+        p.speedX += (Math.random() - 0.5) * 0.01; p.speedY += (Math.random() - 0.5) * 0.01;
+        p.speedX = Math.max(-0.8, Math.min(0.8, p.speedX)); p.speedY = Math.max(-0.8, Math.min(0.8, p.speedY));
+        var alpha = p.opacity * (1 - p.life / p.maxLife);
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rotation); ctx.fillStyle = p.color; ctx.globalAlpha = Math.max(0.01, alpha); ctx.font = p.size + 'px "Segoe UI Emoji", "Apple Color Emoji", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(p.symbol, 0, 0); ctx.restore();
+      }
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    var bootMessages = ['Inicializando...','Carregando módulos...','Configurando interface...','Conectando ao servidor...','MATHX pronto!','Powered by M4L!K 🚀'];
+    var index = 0;
+    var messageInterval = setInterval(function() { index++; if (index < bootMessages.length) { statusEl.textContent = bootMessages[index]; } else { clearInterval(messageInterval); } }, 400);
+
+    setTimeout(function() { bootScreen.classList.add('hidden'); setTimeout(function() { bootScreen.style.display = 'none'; }, 800); }, 4500);
+    setTimeout(function() { if (!bootScreen.classList.contains('hidden')) { bootScreen.classList.add('hidden'); setTimeout(function() { bootScreen.style.display = 'none'; }, 800); } }, 7000);
+    console.log('✅ Boot screen carregado com sucesso');
+  })();
+</script>
+
+<!-- ═══════════════════════════════════════
+     NAVBAR
+═══════════════════════════════════════ -->
+<nav class="navbar">
+  <div class="nav-logo" onclick="goHome()" style="cursor:pointer">
+    <span class="logo-math">MATH</span><span class="logo-x">X</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#" onclick="switchDisciplina('matematica'); return false;">Matemática</a></li>
+    <li><a href="#" onclick="switchDisciplina('quimica'); return false;">🧪 Química</a></li>
+    <li><a href="#" onclick="switchDisciplina('fisica'); return false;">⚡ Física</a></li>
+    <li><a href="#" onclick="switchDisciplina('biologia'); return false;">🧬 Biologia</a></li>
+    <li><a href="#" onclick="switchDisciplina('historia'); return false;">📜 História</a></li>
+    <li><a href="#" onclick="switchDisciplina('geografia'); return false;">🌍 Geografia</a></li>
+    <li><a href="philo-x.html" target="_blank">🧠 Filosofia</a></li>
+    <li><a href="exames.html">📝 Exames</a></li>
+    <li><a href="#" onclick="switchDisciplina('quiz'); return false;">🧠 Quiz</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="btn-history" onclick="toggleHistory()" title="Histórico">
+      <i class="fas fa-history"></i>
+      <span class="history-count" id="history-count" style="display:none">0</span>
+    </button>
+    <button class="nav-toggle" onclick="toggleMenu()">☰</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     PAINEL HISTÓRICO
+═══════════════════════════════════════ -->
+<div class="history-panel" id="history-panel">
+  <div class="history-header">
+    <span><i class="fas fa-history"></i> Histórico de Cálculos</span>
+    <button onclick="clearHistory()" class="btn-clear-history">Limpar</button>
+  </div>
+  <div class="history-list" id="history-list">
+    <p class="history-empty">Nenhum cálculo ainda.</p>
+  </div>
+</div>
+<div class="history-overlay" id="history-overlay" onclick="toggleHistory()"></div>
+
+<!-- ═══════════════════════════════════════
+    PÁGINA INICIAL
+═══════════════════════════════════════ -->
+<div id="page-home" class="page active">
+  <section class="hero">
+    <div class="hero-content">
+        
+      <h1 class="hero-title"><span class="logo-math">MATH</span><span class="logo-x">X</span></h1>
+      <p class="hero-sub">
+  Resolve equações, Estequiometria, quizes e muito mais.
+  <br>
+  <span style="font-size:0.8rem;color:#4fa3ff;font-weight:300;">X-Ecosystem — Educação para todos</span>
+</p>
+      <p class="hero-desc">Escolhe uma disciplina abaixo para começar.</p>
+      <div class="hero-badges">
+        <span class="badge" onclick="switchDisciplina('matematica')">📐 Matemática</span>
+        <span class="badge" onclick="switchDisciplina('quimica')">🧪 Química</span>
+        <span class="badge" onclick="switchDisciplina('fisica')">⚡ Física</span>
+        <span class="badge" onclick="switchDisciplina('biologia')">🧬 Biologia</span>
+        <span class="badge" onclick="switchDisciplina('historia')">📜 História</span>
+        <span class="badge" onclick="switchDisciplina('geografia')">🌍 Geografia</span>
+        <a href="philo-x.html" target="_blank" class="badge" style="text-decoration:none;">🤔 Filosofia</a>
+        <a href="exames.html" target="_blank" class="badge" style="text-decoration:none;">📒Exames</a>
+        <span class="badge badge-new" onclick="switchDisciplina('quiz')">🧠 Quiz</span>
+      </div>
+    </div>
+    <div class="hero-anim">
+      <span class="float-formula f1">∑</span><span class="float-formula f2">∫</span>
+      <span class="float-formula f3">π</span><span class="float-formula f4">√</span>
+      <span class="float-formula f5">∞</span><span class="float-formula f6">Δ</span>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════
+   DISCIPLINAS
+═══════════════════════════════════════ -->
+<div id="page-disciplina" class="page">
+  <div class="disciplina-header">
+    <button class="btn-voltar" onclick="goHome()"><i class="fas fa-arrow-left"></i> Início</button>
+    <h2 id="disciplina-titulo">Matemática</h2>
+  </div>
+  <div class="disciplina-tabs" id="disciplina-tabs">
+    <button class="disciplina-tab active" data-disciplina="matematica" onclick="switchDisciplina('matematica')">
+      <i class="fas fa-calculator"></i> Matemática <span class="badge-count">12</span>
+    </button>
+    <button class="disciplina-tab" data-disciplina="quimica" onclick="switchDisciplina('quimica')">
+      <i class="fas fa-flask"></i> Química <span class="badge-count">8</span>
+    </button>
+    <button class="disciplina-tab" data-disciplina="fisica" onclick="switchDisciplina('fisica')">
+      <i class="fas fa-bolt"></i> Física <span class="badge-count">7</span>
+    </button>
+    <button class="disciplina-tab" data-disciplina="biologia" onclick="switchDisciplina('biologia')">
+      <i class="fas fa-dna"></i> Biologia <span class="badge-count">2</span>
+    </button>
+    <button class="disciplina-tab" data-disciplina="historia" onclick="switchDisciplina('historia')">
+      <i class="fas fa-scroll"></i> História <span class="badge-count">5</span>
+    </button>
+    <button class="disciplina-tab" data-disciplina="geografia" onclick="switchDisciplina('geografia')">
+  <i class="fas fa-globe-africa"></i> Geografia <span class="badge-count">6</span>
+</button>
+    <button class="disciplina-tab" onclick="window.location.href='exames.html'" style="cursor:pointer;">
+  <i class="fas fa-file-alt"></i> Exames
+</button>
+    <button class="disciplina-tab" data-disciplina="quiz" onclick="switchDisciplina('quiz')">
+      <i class="fas fa-brain"></i> Quiz
+    </button>
+  </div>
+
+  <!-- LISTA DE MÓDULOS -->
+  <div id="modulo-lista" class="modulo-lista">
+    <div class="modules-grid" id="modules-grid"></div>
+  </div>
+
+  <!-- PÁGINA DE MÓDULO INDIVIDUAL -->
+  <div id="modulo-pagina" class="modulo-pagina" style="display:none">
+    <button class="btn-voltar" onclick="showList()"><i class="fas fa-arrow-left"></i> Voltar</button>
+    <div id="modulo-conteudo"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MASCOTE MATHBOT
+═══════════════════════════════════════ -->
+<div class="mascote-container" id="mascote">
+  <div class="mascote-body">
+    <div class="mascote-antena mascote-antena-left"></div>
+    <div class="mascote-antena mascote-antena-right"></div>
+    <div class="mascote-glow"></div>
+    <div class="mascote-eyes">
+      <div class="mascote-eye"><div class="mascote-pupil" id="pupil-left"></div></div>
+      <div class="mascote-eye"><div class="mascote-pupil" id="pupil-right"></div></div>
+    </div>
+    <div class="mascote-mouth"></div>
+    <div class="mascote-label">MATHXBOT</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     QUIZ CANCELAR MODAL
+═══════════════════════════════════════ -->
+<div class="quiz-cancelar-modal" id="quiz-cancelar-modal">
+  <div class="quiz-cancelar-box">
+    <h3>⚠ Cancelar o jogo?</h3>
+    <p>Os teus <strong id="modal-pontos-atuais">0</strong> pontos serão guardados no ranking.<br>Tens a certeza que queres sair?</p>
+    <div class="quiz-cancelar-btns">
+        <button class="btn-quiz-cancelar" onclick="confirmarSairQuiz()" id="btn-cancelar" style="display:none">✕ Cancelar Jogo</button>
+      <button class="btn-confirmar-cancelar" onclick="confirmarSairQuiz()">✕ Sair e Guardar</button>
+      <button class="btn-continuar-quiz" onclick="fecharModalCancelar()">▶ Continuar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════ -->
+<footer class="footer">
+    
+  <p>
+    <span class="logo-math">MATH</span><span class="logo-x">X</span>
+    &nbsp;—&nbsp; Powered by <span class="powered">M4L!K</span>
+    &nbsp;—&nbsp; IDEA: <span class="powered">RAYKING👑</span>
+  </p>
+  <p class="footer-sub">Ferramenta educativa de aprendizagem, e resolução de exercícios.</p>
+  <p class="footer-sub">Somente para Décima Segunda Classe</p>
+  <div style="text-align:center;padding:1rem;background:rgba(255,215,0,0.05);border-radius:12px;margin:1rem 0;">
+  <p style="color:var(--text-muted);font-size:0.85rem;">
+    ❤️ Este projeto é 100% gratuito para alunos.
+    Se achas útil, <a href="https://ko-fi.com/seu-link" target="_blank" style="color:#ffd700;">apoia-nos com um café</a> ☕
+  </p>
+</div>
+</footer>
+
+<!-- ═══════════════════════════════════════
+     MATHX SCRIPTS 
+═══════════════════════════════════════ -->
+<script src="script.js"></script>
+</body>
+</html
