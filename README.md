@@ -43,7 +43,7 @@ Este projeto está licenciado sob a **GNU General Public License v3.0**.
 
 ##  Créditos
 
-- **Desenvolvimento:** [M4L!K](https://github.com/MALIK17)
+- **Desenvolvimento:** [M4L!K](https://github.com/M4LIK17)
 - **Idealizador:** RAYKING 👑
 - **Tecnologias:** HTML, CSS, JS, Firebase, Chart.js, Leaflet, Three.js
 
