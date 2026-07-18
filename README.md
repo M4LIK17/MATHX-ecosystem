@@ -1,57 +1,37 @@
+# MATHX-ecosystem
+Projeto pra ajudar quem ta na 12ª classe a estudar. 
+É um site com matéria de Matemática, Geo e Filosofia.
+
+### Links do projeto
+- Site principal: https://mathx-project.neocities.org
+- GEO-X: https://mathx-project.neocities.org/geo-x
+- PHILO-X: https://mathx-project.neocities.org/philo-x
+
+### Como usar
+1. Baixa os arquivos ou abre o link acima
+2. Clica em `index.html` pra abrir no navegador
+3. Escolhe a matéria que queres
+4. Tem módulos, exercícios e quizzes pra treinar
+5. Pra fazer exames clica no botão "EXAMES"
+
+### Quero ajudar, como faço?
+Se quiseres dar uma força pode:
+- Mandar perguntas novas pro quiz
+- Adicionar mais exames
+- Achar bugs e me avisar
+- Dar ideias pra deixar o design melhor
+
+É só abrir uma issue aqui no github ou mandar um pull request.
+
+### Licença
+Usa a licença GPL-3.0 
+Podes usar, mudar e partilhar, mas tem que continuar gratuito.
+
+### Créditos
+Feito por: M4L!K 
+Ideia: RAYKING 👑
+Usei: HTML, CSS, JavaScript, Firebase, Chart.js, Leaflet e Three.js
 
 ---
-
-##  Ligações
-
-| Plataforma | Link |
-|---|---|
-| **MATHX** | [mathx-project.neocities.org](https://mathx-project.neocities.org) |
-| **GEO-X** | [mathx-project.neocities.org/geo-x](https://mathx-project.neocities.org/geo-x) |
-| **PHILO-X** | [mathx-project.neocities.org/philo-x](https://mathx-project.neocities.org/philo-x) |
-
----
-
-## Como usar
-
-1. Abre o `index.html` no navegador
-2. Escolhe uma disciplina
-3. Explora os módulos, exercícios e quizzes
-4. Para exames, clica em "EXAMES"
-
----
-
-## Contribuir
-
-Queres contribuir?
-
-- Sugerir perguntas para o quiz
-- Adicionar exames
-- Corrigir bugs
-- Melhorar o design
-
-Abre uma **issue** ou faz um **pull request**.
-
----
-
-## Licença
-
-Este projeto está licenciado sob a **GNU General Public License v3.0**.
-
-É livre para usar, modificar e distribuir, desde que mantido aberto e gratuito.
-
----
-
-##  Créditos
-
-- **Desenvolvimento:** [M4L!K](https://github.com/M4LIK17)
-- **Idealizador:** RAYKING 👑
-- **Tecnologias:** HTML, CSS, JS, Firebase, Chart.js, Leaflet, Three.js
-
----
-
-**❤️ Feito com dedicação para a educação.**
-
----
-
- *X Ecosystem — Educação para todos.*# MATHX-ecosystem
-Ferramenta web educativa e exclusiva para 12 classe
+Feito com muito esforço pra ajudar na educação :)
+X Ecosystem - Educação para todos
